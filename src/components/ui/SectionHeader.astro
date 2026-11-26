@@ -10,7 +10,7 @@ const { title, subtitle, link, align = 'left' } = Astro.props;
     {subtitle && <p class:list={[align === 'center' ? 'h5' : 'paragraph', 'muted']}>{subtitle}</p>}
   </div>
   {link && (
-    <a class="arrow-link h6 blue" href={link.href}>{link.label}<Icon name="arrow-right" /></a>
+    <a class="arrow-link paragraph blue" href={link.href}>{link.label}<Icon name="arrow-right" size={16} /></a>
   )}
 </div>
 

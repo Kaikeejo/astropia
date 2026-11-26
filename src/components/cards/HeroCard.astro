@@ -5,7 +5,7 @@ import Icon from '../ui/Icon.astro';
 
 interface Props { hero: CollectionEntry<'heroes'> }
 const { hero } = Astro.props;
-const { title, author, category, price, pattern } = hero.data;
+const { title, author, category, isNew, pattern } = hero.data;
 ---
 
 <article class="hero-card" data-category={category}>
@@ -24,7 +24,7 @@ const { title, author, category, price, pattern } = hero.data;
   <div class="hero-card__body">
     <div class="hero-card__title-row">
       <h3 class="h6 hero-card__title">{title}</h3>
-      <span class="accent blue">{price}</span>
+      {isNew && <span class="tag blue">New</span>}
     </div>
     <p class="hero-card__meta paragraph muted">
       <span class="avatar" aria-hidden="true"></span>
@@ -70,7 +70,7 @@ const { title, author, category, price, pattern } = hero.data;
     position: relative;
     display: grid;
     place-items: center;
-    padding: 10px;
+    padding: 14px;
     border: 0;
     border-radius: var(--radius-full);
     color: var(--color-text);

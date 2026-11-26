@@ -2,29 +2,31 @@
 import type { CollectionEntry } from 'astro:content';
 import Pattern from '../ui/Pattern.astro';
 import Icon from '../ui/Icon.astro';
+import Starfield from '../ui/Starfield.astro';
 
 interface Props { item: CollectionEntry<'featured'> }
 const { name, badge, headline, description, file, pattern } = Astro.props.item.data;
 ---
 
 <article class="featured-card">
+  <Starfield />
   <div class="featured-card__content">
     <div class="featured-card__top">
       <div class="featured-card__name">
         <span class="h5 muted">{name}</span>
-        <span class="badge accent blue">{badge}</span>
+        <span class="tag accent blue">{badge}</span>
       </div>
       <ul class="featured-card__tech" aria-label="Built with">
-        <li title="3D"><Icon name="box" size={20} /></li>
-        <li title="Particles"><Icon name="sparkles" size={20} /></li>
-        <li title="Shaders"><Icon name="layers" size={20} /></li>
+        <li title="3D"><Icon name="box" size={16} /></li>
+        <li title="Particles"><Icon name="sparkles" size={16} /></li>
+        <li title="Shaders"><Icon name="layers" size={16} /></li>
       </ul>
     </div>
     <div class="featured-card__text">
       <h3 class="h3">{headline}</h3>
       <p class="paragraph muted">{description}</p>
     </div>
-    <a class="featured-card__link h6 blue" href={`#${Astro.props.item.id}`}>Learn more<Icon name="chevron-right" size={20} /></a>
+    <a class="featured-card__link paragraph blue" href={`#${Astro.props.item.id}`}>Learn more<Icon name="chevron-right" size={16} /></a>
   </div>
 
   <div class="featured-card__preview">
@@ -50,15 +52,50 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
       var(--color-surface);
     transition: border-color var(--dur) var(--ease);
   }
-  .featured-card:hover { border-color: var(--color-border-strong); }
+  /* hover: same animated pink/blue edge as the hero search bar (trial) */
+  .featured-card { position: relative; isolation: isolate; }
+  .featured-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--border-angle),
+      rgb(217 40 117 / 0.35) 0deg,
+      rgb(255 120 180 / 1) 40deg,
+      rgb(217 40 117 / 0.5) 80deg,
+      rgb(76 141 255 / 0.25) 130deg,
+      rgb(76 141 255 / 0.35) 180deg,
+      rgb(150 195 255 / 1) 220deg,
+      rgb(76 141 255 / 0.5) 260deg,
+      rgb(217 40 117 / 0.25) 310deg,
+      rgb(217 40 117 / 0.35) 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: border-spin 8s linear infinite;
+    opacity: 0;
+    transition: opacity 400ms var(--ease);
+    pointer-events: none;
+  }
+  .featured-card:hover { border-color: transparent; }
+  .featured-card:hover::before { opacity: 1; }
+  /* hover: starfield fades in behind the content */
+  .featured-card :global(.starfield) { z-index: -1; opacity: 0; transition: opacity 600ms var(--ease); }
+  .featured-card:hover :global(.starfield) { opacity: 1; }
+  @property --border-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  @keyframes border-spin { to { --border-angle: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .featured-card::before { animation: none; } }
   .featured-card__content { display: flex; flex-direction: column; gap: var(--space-24); padding-right: var(--space-48); }
   .featured-card__top { display: flex; align-items: center; gap: var(--space-16); }
   .featured-card__name { flex: 1; display: flex; align-items: center; gap: var(--space-16); }
-  .badge { padding: 4px var(--space-8); border-radius: var(--radius-full); background: var(--color-surface-2); }
   .featured-card__tech { display: flex; gap: var(--space-8); list-style: none; margin: 0; padding: 0; }
   .featured-card__tech li {
     display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
-    background: var(--color-surface-2); border: 1px solid var(--color-border); color: var(--color-text-muted);
+    background: var(--raised-bg); box-shadow: var(--raised-edge); color: var(--color-text-muted); /* same as .tag */
   }
   .featured-card__text { display: flex; flex-direction: column; gap: var(--space-16); min-height: 144px; }
   .featured-card__link { display: inline-flex; align-items: center; gap: 4px; align-self: flex-start; }
@@ -72,6 +109,7 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
     border-left: 1px solid var(--color-border);
     background: var(--color-surface-2);
     overflow: hidden;
+    margin-bottom: -16px; /* extra hidden below the card, so lifting it on hover never shows a gap */
     transition: translate 400ms var(--ease);
   }
   .featured-card:hover .featured-card__preview { translate: 0 -8px; }
@@ -81,5 +119,7 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
   .dots i:nth-child(2) { background: #febc2e; }
   .dots i:nth-child(3) { background: #28c840; }
   .tab { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-8) var(--space-16); border-radius: var(--radius-sm); background: var(--color-surface-2); }
-  .featured-card__canvas { position: relative; height: 256px; }
+  .featured-card__canvas { position: relative; height: calc(256px + 16px); }
+  /* the window already has a border: drop the thumbnail's own so edges aren't doubled */
+  .featured-card__canvas :global(.pattern) { border: 0; border-radius: 0; }
 </style>

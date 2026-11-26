@@ -1,6 +1,6 @@
 [
-  {"id": "helical-solar-system", "title": "Helical Solar System", "author": "Astropia", "category": "Space", "price": "Free", "pattern": "grid", "likes": 128, "order": 1},
-  {"id": "particle-galaxy", "title": "Particle Galaxy", "author": "Mira Sol", "category": "Particles", "price": "Free", "pattern": "rays", "likes": 72, "order": 2},
+  {"id": "helical-solar-system", "title": "Helical Solar System", "author": "Astropia", "category": "Space", "price": "Free", "pattern": "grid", "likes": 128, "isNew": true, "order": 1},
+  {"id": "particle-galaxy", "title": "Particle Galaxy", "author": "Mira Sol", "category": "Particles", "price": "Free", "pattern": "rays", "likes": 72, "isNew": true, "order": 2},
   {"id": "warp-starfield", "title": "Warp Starfield", "author": "Orion Studio", "category": "Canvas", "price": "Free", "pattern": "wavy", "likes": 64, "order": 3},
   {"id": "nebula-clouds", "title": "Nebula Clouds", "author": "Lumen Lab", "category": "Shaders", "price": "Pro", "pattern": "squares", "likes": 51, "order": 4},
   {"id": "orbit-rings", "title": "Orbit Rings", "author": "Astropia", "category": "3D", "price": "Free", "pattern": "dots", "likes": 47, "order": 5},

@@ -10,7 +10,7 @@ const { type = 'primary', size = 'large', href, class: cls, ...rest } = Astro.pr
 const Tag = href ? 'a' : 'button';
 ---
 
-<Tag href={href} class:list={['btn', 'h6', `btn--${type}`, `btn--${size}`, type === 'secondary' && 'gradient-border', cls]} {...rest}>
+<Tag href={href} class:list={['btn', 'paragraph', `btn--${type}`, `btn--${size}`, type === 'secondary' && 'gradient-border', cls]} {...rest}>
   <slot />
 </Tag>
 
@@ -25,7 +25,6 @@ const Tag = href ? 'a' : 'button';
     cursor: pointer;
     border: 0;
     font-size: 0.875rem; /* button labels: same size as Paragraph */
-    transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
   }
   .btn--large { padding: var(--space-16) var(--space-24); }
   .btn--small { padding: var(--space-8) var(--space-16); }
@@ -34,9 +33,7 @@ const Tag = href ? 'a' : 'button';
   .btn--large.btn--secondary { padding: calc(var(--space-16) - 1px) calc(var(--space-24) - 1px); }
   .btn--small.btn--secondary { padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px); }
 
-  .btn:hover { transform: translateY(-1px); }
-  .btn--primary:hover { filter: brightness(1.12); box-shadow: 0 8px 24px -8px rgb(217 40 117 / 0.6); }
+  /* primary (pink/blue) hover: removed for now, new effect to come */
   .btn--secondary:hover { --gb-fill: var(--color-surface-2); }
-  .btn:active { transform: translateY(0); }
   .btn:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
 </style>

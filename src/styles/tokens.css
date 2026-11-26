@@ -8,6 +8,10 @@
   --color-surface: #11141c;
   --color-surface-2: #181c26;
   --color-well: #0a0b10; /* dark inset: filter pill + thumbnails */
+  /* raised grey button (active filter, sort, close...) */
+  --raised-bg: linear-gradient(180deg, #2c2f38 0%, #1b1d24 100%);
+  --raised-edge: inset 0 1px 0 rgb(255 255 255 / 0.1), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  --raised-shadow: var(--raised-edge), 0 4px 12px rgb(0 0 0 / 0.55);
   --color-border: #232836;
   --color-border-strong: #343b4d;
   --color-text: #f3f5f9;
@@ -42,7 +46,6 @@
   /* fonts */
   --font-heading: 'Sora Variable', system-ui, sans-serif;
   --font-body: 'Inter Variable', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* layout */
   --container: 75rem;

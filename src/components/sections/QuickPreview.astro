@@ -11,12 +11,11 @@ import Starfield from '../ui/Starfield.astro';
       <span class="qp__url paragraph muted"><Icon name="globe" size={16} /><span data-qp-url>astropia.dev/preview</span></span>
       <div class="qp__actions">
         <Button type="primary" size="small" data-qp-copy>Copy component</Button>
-        <button type="button" class="qp__close" aria-label="Close preview" data-qp-close><Icon name="x" size={20} /></button>
+        <button type="button" class="qp__close btn-raised" aria-label="Close preview" data-qp-close><Icon name="x" size={20} /></button>
       </div>
     </header>
     <div class="qp__body">
       <Starfield />
-      <div class="qp__glow" aria-hidden="true"></div>
       <p class="accent muted" data-qp-eyebrow>Hero</p>
       <h2 class="h1">Your headline here</h2>
       <p class="h5 muted">This is how your own content sits on top of the animation.</p>
@@ -44,11 +43,9 @@ import Starfield from '../ui/Starfield.astro';
   .qp__title .h6 { color: var(--color-text); }
   .qp__url { display: inline-flex; align-items: center; gap: var(--space-8); padding: var(--space-8) var(--space-16); border-radius: var(--radius-full); background: var(--color-surface-2); }
   .qp__actions { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: var(--space-8); }
-  .qp__close { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-surface-2); border: 1px solid var(--color-border); cursor: pointer; transition: background var(--dur) var(--ease); }
-  .qp__close:hover { background: var(--color-border-strong); }
+  .qp__close { width: 40px; height: 40px; padding: 0; }
   .qp__body { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-24); text-align: center; background: var(--color-bg); overflow: hidden; }
-  .qp__body > :not(.starfield, .qp__glow) { position: relative; }
-  .qp__glow { position: absolute; left: 50%; top: 50%; width: 1000px; height: 560px; translate: -50% -60%; border-radius: 50%; background: radial-gradient(closest-side, rgb(77 115 255 / 0.35), rgb(76 141 255 / 0.12) 50%, transparent); filter: blur(80px); }
+  .qp__body > :not(.starfield) { position: relative; }
   .qp__buttons { display: flex; gap: var(--space-16); }
 </style>
 

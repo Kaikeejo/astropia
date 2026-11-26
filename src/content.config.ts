@@ -11,6 +11,7 @@ const heroes = defineCollection({
     author: z.string(),
     category: z.string(),
     price: z.enum(['Free', 'Pro']),
+    isNew: z.boolean().default(false), // shows a NEW tag on the card
     pattern,
     likes: z.number(),
     order: z.number(),

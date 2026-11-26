@@ -26,7 +26,7 @@ p, h1, h2, h3, h4, h5, h6 { margin: 0; }
 .h5 { font-family: var(--font-heading); font-weight: 400; font-size: 1.125rem; line-height: 2rem; letter-spacing: -0.005em; }
 .h6 { font-family: var(--font-heading); font-weight: 600; font-size: 1rem; line-height: 1.5rem; letter-spacing: -0.005em; }
 .paragraph { font-family: var(--font-body); font-weight: 400; font-size: 0.875rem; line-height: 1.25rem; }
-.accent { font-family: var(--font-mono); font-weight: 500; font-size: 0.6875rem; line-height: 1rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.accent { font-family: var(--font-body); font-weight: 600; font-size: 0.6875rem; line-height: 1rem; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .muted { color: var(--color-text-muted); }
 .blue { color: var(--color-blue); }
@@ -52,4 +52,34 @@ p, h1, h2, h3, h4, h5, h6 { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* Grey button: raised dark tab, same as the active filter. Use on any grey button. */
+.btn-raised {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  border: 0; border-radius: var(--radius-full);
+  background: var(--raised-bg);
+  box-shadow: var(--raised-shadow);
+  color: var(--color-text);
+  cursor: pointer; white-space: nowrap;
+  transition: filter var(--dur) var(--ease);
+}
+.btn-raised:hover { filter: brightness(1.15); }
+.btn-raised:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+
+/* Tag: same raised grey as .btn-raised, but static (no hover). Use on any tag/badge. */
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 4px var(--space-8);
+  border-radius: var(--radius-full);
+  background: var(--raised-bg);
+  box-shadow: var(--raised-edge); /* no drop shadow on tags */
+  white-space: nowrap;
+  /* tag text: Inter bold, not the mono accent font */
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  font-weight: 700;
+  line-height: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
