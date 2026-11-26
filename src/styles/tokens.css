@@ -7,6 +7,7 @@
   --color-bg: #090b11;
   --color-surface: #11141c;
   --color-surface-2: #181c26;
+  --color-well: #0a0b10; /* dark inset: filter pill + thumbnails */
   --color-border: #232836;
   --color-border-strong: #343b4d;
   --color-text: #f3f5f9;
