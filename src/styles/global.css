@@ -5,34 +5,35 @@
 html { background: var(--color-bg); color-scheme: dark; }
 body {
   margin: 0;
-  background: var(--color-bg);
+  /* no background here: the page color comes from <html>, so layers with z-index:-1 (hero starfield/glow) stay visible */
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
   -webkit-font-smoothing: antialiased;
 }
+main { overflow-x: clip; }
 img, svg { display: block; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; }
 p, h1, h2, h3, h4, h5, h6 { margin: 0; }
 
 /* ---- Text styles (Figma: H1-H6, Paragraph, Accent) ---- */
-.h1 { font-family: var(--font-heading); font-weight: 600; font-size: 72px; line-height: 80px; letter-spacing: -0.025em; }
-.h2 { font-family: var(--font-heading); font-weight: 600; font-size: 48px; line-height: 56px; letter-spacing: -0.02em; }
-.h3 { font-family: var(--font-heading); font-weight: 600; font-size: 32px; line-height: 40px; letter-spacing: -0.015em; }
-.h4 { font-family: var(--font-heading); font-weight: 600; font-size: 24px; line-height: 32px; letter-spacing: -0.01em; }
-.h5 { font-family: var(--font-heading); font-weight: 400; font-size: 18px; line-height: 32px; letter-spacing: -0.005em; }
-.h6 { font-family: var(--font-heading); font-weight: 600; font-size: 16px; line-height: 24px; letter-spacing: -0.005em; }
-.paragraph { font-family: var(--font-body); font-weight: 400; font-size: 16px; line-height: 24px; }
-.accent { font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 16px; letter-spacing: 0.08em; text-transform: uppercase; }
+.h1 { font-family: var(--font-heading); font-weight: 600; font-size: 4rem; line-height: 4.5rem; letter-spacing: -0.025em; }
+.h2 { font-family: var(--font-heading); font-weight: 600; font-size: 3rem; line-height: 3.5rem; letter-spacing: -0.02em; }
+.h3 { font-family: var(--font-heading); font-weight: 600; font-size: 2rem; line-height: 2.5rem; letter-spacing: -0.015em; }
+.h4 { font-family: var(--font-heading); font-weight: 600; font-size: 1.5rem; line-height: 2rem; letter-spacing: -0.01em; }
+.h5 { font-family: var(--font-heading); font-weight: 400; font-size: 1.125rem; line-height: 2rem; letter-spacing: -0.005em; }
+.h6 { font-family: var(--font-heading); font-weight: 600; font-size: 1rem; line-height: 1.5rem; letter-spacing: -0.005em; }
+.paragraph { font-family: var(--font-body); font-weight: 400; font-size: 0.875rem; line-height: 1.25rem; }
+.accent { font-family: var(--font-mono); font-weight: 500; font-size: 0.6875rem; line-height: 1rem; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .muted { color: var(--color-text-muted); }
 .blue { color: var(--color-blue); }
 
 @media (max-width: 720px) {
-  .h1 { font-size: 48px; line-height: 56px; }
-  .h2 { font-size: 32px; line-height: 40px; }
+  .h1 { font-size: 3rem; line-height: 3.5rem; }
+  .h2 { font-size: 2rem; line-height: 2.5rem; }
 }
 
 /* ---- Layout ---- */

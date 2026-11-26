@@ -24,6 +24,7 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
 </section>
 
 <style>
+  .fresh { padding-top: var(--space-48); }
   .fresh__inner { display: flex; flex-direction: column; gap: var(--space-32); }
   .fresh__filters { display: flex; align-items: center; gap: var(--space-16); }
   .fresh__chips { flex: 1; display: flex; flex-wrap: wrap; gap: var(--space-8); }
@@ -34,7 +35,7 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
     cursor: pointer; color: var(--color-text);
   }
   .fresh__sort :global(svg) { color: var(--color-text-muted); }
-  .fresh__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
+  .fresh__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); }
   .fresh__all { display: inline-flex; align-items: center; gap: var(--space-8); align-self: flex-end; }
   .fresh__all :global(svg) { transition: translate var(--dur) var(--ease); }
   .fresh__all:hover :global(svg) { translate: 4px 0; }

@@ -1,54 +1,94 @@
 ---
-// The hero starfield. Same deterministic layout as the Figma "Starfield" layer
-// (seeded random, so it never changes between builds).
-const W = 1440, H = 456;
+// Drifting starfield in three depth layers (far / mid / near).
+// Each layer scrolls sideways on a seamless loop; nearer layers move faster = parallax.
+// The mouse also nudges the layers slightly (more for near stars).
+const W = 1440, H = 720;
 type Star = { x: number; y: number; s: number; o: number; blue: boolean; bright: boolean };
-const stars: Star[] = [];
+const layers: Record<'far' | 'mid' | 'near', Star[]> = { far: [], mid: [], near: [] };
 const inContent = (x: number, y: number) => x > 360 && x < 1080 && y > 72 && y < 384;
+
 function batch(seed0: number, count: number, skip: number, baseOp: number, spread: number) {
   let seed = seed0;
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   let added = 0, attempts = 0;
-  while (added < count && attempts < 1000) {
+  while (added < count && attempts < 2000) {
     attempts++;
     const x = rnd() * W, y = rnd() * H;
     if (inContent(x, y) && rnd() < skip) continue;
     const bright = rnd() < 0.08;
-    const s = bright ? 3 : rnd() < (seed0 === 42 ? 0.7 : 0.6) ? 1 : 2;
+    const s = bright ? 3 : rnd() < 0.62 ? 1 : 2;
     const blue = rnd() < 0.25;
     const o = bright ? 0.9 : baseOp + rnd() * spread;
-    stars.push({ x: Math.round(x), y: Math.round(y), s, o, blue, bright });
+    const star = { x: Math.round(x), y: Math.round(y), s, o, blue, bright };
+    (bright ? layers.near : s === 1 ? layers.far : layers.mid).push(star);
     added++;
   }
 }
-batch(42, 70, 0.8, 0.15, 0.35);
-batch(1337, 110, 0.6, 0.25, 0.4);
+batch(42, 110, 0.8, 0.15, 0.35);
+batch(1337, 150, 0.6, 0.25, 0.4);
+const order = ['far', 'mid', 'near'] as const;
 ---
 
-<svg class="starfield" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-  <defs>
-    <filter id="star-glow" x="-200%" y="-200%" width="500%" height="500%">
-      <feGaussianBlur stdDeviation="2.5" />
-      <feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.75  0 0 0 0 1  0 0 0 0.9 0" />
-      <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-    </filter>
-  </defs>
-  {stars.map((st, i) => (
-    <circle
-      cx={st.x + st.s / 2}
-      cy={st.y + st.s / 2}
-      r={st.s / 2}
-      fill={st.blue ? '#cfe0ff' : '#ffffff'}
-      opacity={st.o.toFixed(2)}
-      filter={st.bright ? 'url(#star-glow)' : undefined}
-      class:list={[{ twinkle: st.bright || i % 9 === 0 }]}
-      style={`--d:${(i % 7) * 0.6}s`}
-    />
+<div class="starfield" aria-hidden="true" data-starfield>
+  {order.map((name) => (
+    <div class={`starfield__layer starfield__layer--${name}`}>
+      <div class="starfield__track">
+        {[0, 1].map(() => (
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin slice">
+            {layers[name].map((st, i) => (
+              <circle
+                cx={st.x + st.s / 2}
+                cy={st.y + st.s / 2}
+                r={st.bright ? 1.6 : st.s / 2}
+                fill={st.blue ? '#cfe0ff' : '#ffffff'}
+                opacity={st.o.toFixed(2)}
+                class:list={[{ twinkle: st.bright || i % 9 === 0, glow: st.bright }]}
+                style={`--d:${(i % 7) * 0.6}s`}
+              />
+            ))}
+          </svg>
+        ))}
+      </div>
+    </div>
   ))}
-</svg>
+</div>
 
 <style>
-  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+  .starfield__layer {
+    position: absolute; inset: -2rem;
+    translate: calc(var(--mx, 0) * var(--depth)) calc(var(--my, 0) * var(--depth));
+    transition: translate 1.2s var(--ease);
+  }
+  .starfield__layer--far  { --depth: 6px;  --speed: 360s; }
+  .starfield__layer--mid  { --depth: 14px; --speed: 220s; }
+  .starfield__layer--near { --depth: 26px; --speed: 130s; }
+  .starfield__track { display: flex; width: 200%; height: 100%; animation: drift var(--speed) linear infinite; }
+  .starfield__track svg { width: 50%; height: 100%; flex: none; }
+  @keyframes drift { to { transform: translateX(-50%); } }
+
+  .glow { filter: drop-shadow(0 0 4px rgb(153 191 255 / 0.9)); }
   .twinkle { animation: twinkle 4.2s ease-in-out infinite; animation-delay: var(--d); }
   @keyframes twinkle { 50% { opacity: 0.25; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .starfield__track, .twinkle { animation: none !important; }
+    .starfield__layer { transition: none; }
+  }
 </style>
+
+<script>
+  // gentle mouse parallax: layers shift a few px toward the pointer
+  const fields = document.querySelectorAll<HTMLElement>('[data-starfield]');
+  if (fields.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let raf = 0;
+    addEventListener('pointermove', (e) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const mx = (e.clientX / innerWidth - 0.5) * -2;
+        const my = (e.clientY / innerHeight - 0.5) * -2;
+        fields.forEach((f) => { f.style.setProperty('--mx', String(mx)); f.style.setProperty('--my', String(my)); });
+      });
+    });
+  }
+</script>

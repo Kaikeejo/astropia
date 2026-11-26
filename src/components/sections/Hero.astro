@@ -1,19 +1,23 @@
 ---
 import Starfield from '../ui/Starfield.astro';
+import Nebula from '../ui/Nebula.astro';
 import Icon from '../ui/Icon.astro';
 ---
 
 <section class="hero section" id="explore">
   <Starfield />
+  <Nebula />
   <div class="hero__glow" aria-hidden="true"></div>
   <h1 class="h1">Astro Resources</h1>
   <p class="h5 muted hero__lead">Tweak 3D and particle hero sections live, then copy one component straight into your Astro project.</p>
-  <label class="hero__search gradient-border">
+  <div class="hero__search-wrap">
+  <label class="hero__search">
     <Icon name="search" />
     <span class="sr-only">Search</span>
     <input class="paragraph" type="search" placeholder="Search heroes, effects, authors…" />
     <kbd class="accent muted">⌘K</kbd>
   </label>
+  </div>
 </section>
 
 <style>
@@ -21,29 +25,89 @@ import Icon from '../ui/Icon.astro';
     position: relative;
     display: flex; flex-direction: column; align-items: center; gap: var(--space-32);
     text-align: center;
-    overflow: hidden;
+    padding-top: 8rem;
+    padding-bottom: var(--space-48);
   }
-  .hero > :not(.starfield, .hero__glow) { position: relative; }
+  .hero > :not(.starfield, .hero__glow, .nebula) { position: relative; }
+  /* starfield + glow sit behind all content and bleed into the next section */
+  .hero :global(.starfield),
+  .hero :global(.nebula) {
+    z-index: -1;
+    top: 0;
+    bottom: auto;
+    height: 45rem;
+    mask-image: linear-gradient(to bottom, #000 50%, transparent 100%);
+  }
   .hero__glow {
     position: absolute; left: 50%; top: -120px; width: 900px; height: 480px; translate: -50% 0;
     border-radius: 50%;
     background: radial-gradient(closest-side, rgb(77 115 255 / 0.35), rgb(76 141 255 / 0.12) 50%, transparent);
     filter: blur(80px);
     pointer-events: none;
+    z-index: -1;
   }
-  .hero__lead { max-width: 640px; }
+  .hero__lead { max-width: 640px; margin-top: calc(var(--space-16) * -1); } /* 1rem from the H1 instead of 2rem */
+  /* UI8-style dark glass search bar */
   .hero__search {
-    --gb-fill: var(--color-surface);
+    position: relative;
     display: flex; align-items: center; gap: var(--space-16);
-    width: 100%; max-width: 640px;
-    padding: calc(var(--space-16) - 1px) calc(var(--space-24) - 1px);
+    width: 100%;
+    padding: var(--space-16) var(--space-24);
     border-radius: var(--radius-full);
     color: var(--color-text-muted);
     cursor: text;
+    isolation: isolate;
+    /* smoky tint + blur: anything moving behind shows through, softened */
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.015) 60%), rgb(10 11 16 / 0.5);
+    backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    -webkit-backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 0.08),    /* faint top highlight */
+      inset 0 -10px 20px rgb(0 0 0 / 0.35),       /* depth inside the glass */
+      0 0 0 1px rgb(0 0 0 / 0.5),                 /* dark outer rim */
+      0 12px 36px -10px rgb(0 0 0 / 0.7);
     transition: box-shadow var(--dur) var(--ease);
   }
-  .hero__search:focus-within { box-shadow: 0 0 0 4px rgb(76 141 255 / 0.15), 0 0 32px rgb(217 40 117 / 0.15); }
+  /* animated gradient edge: bright pink + blue highlights travel around the pill */
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  .hero__search::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--border-angle),
+      rgb(217 40 117 / 0.35) 0deg,
+      rgb(255 120 180 / 1) 40deg,
+      rgb(217 40 117 / 0.5) 80deg,
+      rgb(76 141 255 / 0.25) 130deg,
+      rgb(76 141 255 / 0.35) 180deg,
+      rgb(150 195 255 / 1) 220deg,
+      rgb(76 141 255 / 0.5) 260deg,
+      rgb(217 40 117 / 0.25) 310deg,
+      rgb(217 40 117 / 0.35) 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: border-spin 8s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes border-spin { to { --border-angle: 360deg; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__search::before { animation: none; }
+  }
+
+  .hero__search-wrap { position: relative; width: 100%; max-width: 640px; isolation: isolate; }
+  .hero__search-wrap .hero__search { z-index: 1; }
+
+  .hero__search > * { position: relative; }
   .hero__search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--color-text); }
   .hero__search input::placeholder { color: var(--color-text-muted); }
-  kbd { font-size: 11px; letter-spacing: 0; }
+  kbd { font-size: 0.6875rem; letter-spacing: 0; }
 </style>

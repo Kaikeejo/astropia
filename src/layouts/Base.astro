@@ -33,32 +33,13 @@ const { title, description = 'Animated, copy-paste hero sections for Astro.' } =
 </style>
 
 <script>
-  // Shared bits of interactivity: likes (remembered in this browser) and copy buttons.
+  // Shared bits of interactivity: copy buttons + a small toast message.
   const toast = document.querySelector<HTMLElement>('.toast')!;
   let t: number | undefined;
   const say = (msg: string) => {
     toast.textContent = msg; toast.hidden = false;
     clearTimeout(t); t = window.setTimeout(() => (toast.hidden = true), 1800);
   };
-
-  const liked = new Set<string>(JSON.parse(localStorage.getItem('astropia:likes') ?? '[]'));
-  document.querySelectorAll<HTMLButtonElement>('[data-like]').forEach((btn) => {
-    const card = btn.closest('article');
-    const id = card?.querySelector<HTMLElement>('[data-preview]')?.dataset.preview ?? '';
-    const count = btn.querySelector('[data-count]')!;
-    const base = Number(count.textContent);
-    const render = () => {
-      const on = liked.has(id);
-      btn.setAttribute('aria-pressed', String(on));
-      count.textContent = String(base + (on ? 1 : 0));
-    };
-    render();
-    btn.addEventListener('click', () => {
-      liked.has(id) ? liked.delete(id) : liked.add(id);
-      localStorage.setItem('astropia:likes', JSON.stringify([...liked]));
-      render();
-    });
-  });
 
   const copy = async (text: string) => {
     try { await navigator.clipboard.writeText(text); say('Copied to clipboard'); } catch { say('Copy failed'); }

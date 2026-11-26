@@ -5,17 +5,13 @@ import Icon from '../ui/Icon.astro';
 
 interface Props { hero: CollectionEntry<'heroes'> }
 const { hero } = Astro.props;
-const { title, author, category, price, pattern, likes } = hero.data;
+const { title, author, category, price, pattern } = hero.data;
 ---
 
 <article class="hero-card" data-category={category}>
   <div class="hero-card__thumb">
     <Pattern name={pattern} />
     <div class="hero-card__scrim"></div>
-    <button type="button" class="like-pill h6" aria-pressed="false" aria-label={`Like ${title}`} data-like>
-      <span data-count>{likes}</span>
-      <Icon name="heart" />
-    </button>
     <div class="hero-card__actions">
       <button type="button" class="icon-btn" aria-label={`Quick preview ${title}`} data-preview={hero.id} data-title={title} data-category={category}>
         <Icon name="eye" />
@@ -65,20 +61,6 @@ const { title, author, category, price, pattern, likes } = hero.data;
     opacity: 0;
     transition: opacity var(--dur) var(--ease);
   }
-  .like-pill {
-    position: absolute;
-    top: var(--space-16);
-    right: var(--space-16);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-8);
-    padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px);
-    border-radius: var(--radius-full);
-    background: rgb(5 6 10 / 0.72);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    backdrop-filter: blur(16px);
-    cursor: pointer;
-  }
   .hero-card__actions {
     position: absolute;
     inset: 0;
@@ -100,8 +82,8 @@ const { title, author, category, price, pattern, likes } = hero.data;
   }
   .icon-btn:hover { background: var(--color-blue-strong); transform: scale(1.06); }
 
-  /* hover reveal: like pill + actions fade/slide in */
-  .like-pill, .hero-card__actions > * {
+  /* hover reveal: actions fade/slide in */
+  .hero-card__actions > * {
     opacity: 0;
     translate: 0 8px;
     transition: opacity var(--dur) var(--ease), translate var(--dur) var(--ease), background var(--dur) var(--ease), transform var(--dur) var(--ease);
@@ -109,11 +91,8 @@ const { title, author, category, price, pattern, likes } = hero.data;
   .hero-card__actions > :nth-child(2) { transition-delay: 40ms; }
   .hero-card:hover .hero-card__scrim,
   .hero-card:focus-within .hero-card__scrim { opacity: 1; }
-  .hero-card:hover .like-pill, .hero-card:focus-within .like-pill,
   .hero-card:hover .hero-card__actions > *, .hero-card:focus-within .hero-card__actions > * { opacity: 1; translate: 0 0; }
 
-  .like-pill[aria-pressed='true'] { color: var(--color-pink); }
-  .like-pill[aria-pressed='true'] :global(svg) { fill: currentColor; }
 
   .hero-card__body { display: flex; flex-direction: column; gap: var(--space-8); padding: var(--space-8); }
   .hero-card__title-row { display: flex; align-items: center; gap: var(--space-8); }
