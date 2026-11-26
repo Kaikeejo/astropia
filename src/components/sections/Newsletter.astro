@@ -1,14 +1,15 @@
 ---
 import Icon from '../ui/Icon.astro';
 import PixelIcon from '../ui/PixelIcon.astro';
+import Starfield from '../ui/Starfield.astro';
 ---
 
 <section class="newsletter">
+  <Starfield />
   <div class="newsletter__inner">
     <p class="newsletter__message h5 muted"><Icon name="send" class="newsletter__send" />More heroes coming soon. Stay in the loop!</p>
     <form class="newsletter__form" data-newsletter>
       <div class="email-wrap">
-      <span class="email__glow" aria-hidden="true"></span>
       <div class="email">
         <label class="sr-only" for="email">Email address</label>
         <input id="email" class="paragraph" type="email" required placeholder="Enter your email" />
@@ -21,37 +22,80 @@ import PixelIcon from '../ui/PixelIcon.astro';
 
 <style>
   .newsletter {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     padding: var(--space-48) var(--gutter);
     border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
   }
+  .newsletter :global(.starfield) { z-index: -1; }
   .newsletter__inner { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-24); align-items: center; }
   .newsletter__message { display: flex; align-items: center; gap: var(--space-16); }
   .newsletter__message :global(.newsletter__send) { color: var(--color-text); flex: none; }
 
   .email-wrap { position: relative; isolation: isolate; }
+  /* same dark glass + animated gradient edge as the hero search bar */
   .email {
     position: relative;
     display: flex; align-items: center; gap: var(--space-16);
     height: 64px;
-    padding: var(--space-8) var(--space-16) var(--space-8) var(--space-24);
-    border-radius: 32px;
-    border: 1px solid transparent;
-    background:
-      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
-      var(--gradient-border) border-box;
+    padding: var(--space-8) var(--space-8) var(--space-8) var(--space-24);
+    border-radius: var(--radius-full);
+    isolation: isolate;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.015) 60%), rgb(10 11 16 / 0.5);
+    backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    -webkit-backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 0.08),
+      inset 0 -10px 20px rgb(0 0 0 / 0.35),
+      0 0 0 1px rgb(0 0 0 / 0.5);
   }
-  .email__glow {
-    position: absolute; inset: 0; z-index: -1; border-radius: 32px;
-    background: linear-gradient(90deg, rgb(217 40 117 / 0.45), rgb(76 141 255 / 0.45));
-    filter: blur(24px);
-    transition: opacity var(--dur) var(--ease);
-    opacity: 0.8;
+  .email::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--border-angle),
+      rgb(217 40 117 / 0.35) 0deg,
+      rgb(255 120 180 / 1) 40deg,
+      rgb(217 40 117 / 0.5) 80deg,
+      rgb(76 141 255 / 0.25) 130deg,
+      rgb(76 141 255 / 0.35) 180deg,
+      rgb(150 195 255 / 1) 220deg,
+      rgb(76 141 255 / 0.5) 260deg,
+      rgb(217 40 117 / 0.25) 310deg,
+      rgb(217 40 117 / 0.35) 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: border-spin 8s linear infinite;
+    pointer-events: none;
   }
-  .email-wrap:focus-within .email__glow { opacity: 1; }
+  .email > * { position: relative; }
+  @property --border-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  @keyframes border-spin { to { --border-angle: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .email::before { animation: none; } }
   .email input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--color-text); }
-  .email input::placeholder { color: var(--color-blue); }
+  .email input::placeholder { color: var(--color-text-muted); }
   .email__submit { display: grid; place-items: center; width: 48px; height: 48px; background: none; border: 0; cursor: pointer; }
+  .email__submit :global(.pixel-icon) { width: 30px; height: 30px; } /* was 40px */
+  /* pixel arrow colour follows the spinning border: pink when the pink highlight passes the
+     right end of the field, blue when the blue one does (same 8s loop, started together) */
+  @property --pix { syntax: '<color>'; initial-value: #4c8dff; inherits: true; }
+  .email__submit { --color-blue: var(--pix); animation: pix-phase 8s linear infinite; }
+  /* brand blue / brand pink, each held while its highlight passes; quick hand-over via grey (no purple) */
+  @keyframes pix-phase {
+    0%, 31%   { --pix: #4c8dff; } /* blue highlight at the arrow (peak ~14%) */
+    38.9%     { --pix: #9aa3b8; }
+    46%, 81%  { --pix: #d92875; } /* pink highlight at the arrow (peak ~64%) */
+    88.9%     { --pix: #9aa3b8; }
+    96%, 100% { --pix: #4c8dff; }
+  }
+  @media (prefers-reduced-motion: reduce) { .email__submit { animation: none; } }
   .email__submit :global(rect) { transition: opacity 300ms var(--ease), translate 300ms var(--ease); }
   .email__submit:hover :global(rect) { translate: 3px 0; transition-delay: calc(var(--i) * 12ms); }
 

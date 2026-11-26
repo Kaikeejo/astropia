@@ -5,10 +5,10 @@ import Icon from '../ui/Icon.astro';
 import Starfield from '../ui/Starfield.astro';
 
 interface Props { item: CollectionEntry<'featured'> }
-const { name, badge, headline, description, file, pattern } = Astro.props.item.data;
+const { name, badge, headline, description, file, pattern, accent } = Astro.props.item.data;
 ---
 
-<article class="featured-card">
+<article class:list={['featured-card', `featured-card--${accent}`]}>
   <Starfield />
   <div class="featured-card__content">
     <div class="featured-card__top">
@@ -26,7 +26,7 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
       <h3 class="h3">{headline}</h3>
       <p class="paragraph muted">{description}</p>
     </div>
-    <a class="featured-card__link paragraph blue" href={`#${Astro.props.item.id}`}>Learn more<Icon name="chevron-right" size={16} /></a>
+    <a class:list={['featured-card__link', 'paragraph', accent]} href={`#${Astro.props.item.id}`}>Learn more<Icon name="chevron-right" size={16} /></a>
   </div>
 
   <div class="featured-card__preview">
@@ -39,6 +39,9 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
 </article>
 
 <style>
+  /* glow colour per card (set by `accent` in featured.json) */
+  .featured-card--blue { --glow: 38 99 235; }
+  .featured-card--pink { --glow: 217 40 117; }
   .featured-card {
     display: flex;
     flex-direction: column;
@@ -48,7 +51,7 @@ const { name, badge, headline, description, file, pattern } = Astro.props.item.d
     border: 1px solid var(--color-border);
     overflow: hidden;
     background:
-      radial-gradient(ellipse 45.5% 31% at 45% 55%, rgb(38 99 235 / 0.45), rgb(38 99 235 / 0.12) 60%, transparent),
+      radial-gradient(ellipse 45.5% 31% at 45% 55%, rgb(var(--glow) / 0.42), rgb(var(--glow) / 0.1) 60%, transparent),
       var(--color-surface);
     transition: border-color var(--dur) var(--ease);
   }

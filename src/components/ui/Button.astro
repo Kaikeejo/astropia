@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type?: 'primary' | 'secondary';
+  type?: 'primary' | 'secondary' | 'grey';
   size?: 'large' | 'small';
   href?: string;
   class?: string;
@@ -10,7 +10,7 @@ const { type = 'primary', size = 'large', href, class: cls, ...rest } = Astro.pr
 const Tag = href ? 'a' : 'button';
 ---
 
-<Tag href={href} class:list={['btn', 'paragraph', `btn--${type}`, `btn--${size}`, type === 'secondary' && 'gradient-border', cls]} {...rest}>
+<Tag href={href} class:list={['btn', 'paragraph', `btn--${type}`, `btn--${size}`, type === 'secondary' && 'gradient-border', type === 'grey' && 'btn-raised', cls]} {...rest}>
   <slot />
 </Tag>
 

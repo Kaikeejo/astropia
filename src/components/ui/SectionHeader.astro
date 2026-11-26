@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-interface Props { title: string; subtitle?: string; link?: { label: string; href: string }; align?: 'left' | 'center' }
+interface Props { title: string; subtitle?: string; link?: { label: string; href: string; color?: 'blue' | 'pink' }; align?: 'left' | 'center' }
 const { title, subtitle, link, align = 'left' } = Astro.props;
 ---
 
@@ -10,7 +10,7 @@ const { title, subtitle, link, align = 'left' } = Astro.props;
     {subtitle && <p class:list={[align === 'center' ? 'h5' : 'paragraph', 'muted']}>{subtitle}</p>}
   </div>
   {link && (
-    <a class="arrow-link paragraph blue" href={link.href}>{link.label}<Icon name="arrow-right" size={16} /></a>
+    <a class:list={['arrow-link', 'paragraph', link.color ?? 'blue']} href={link.href}>{link.label}<Icon name="arrow-right" size={16} /></a>
   )}
 </div>
 

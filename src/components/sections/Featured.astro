@@ -7,7 +7,7 @@ const items = (await getCollection('featured')).sort((a, b) => a.data.order - b.
 
 <section class="section">
   <div class="container featured">
-    <SectionHeader title="Featured this month" subtitle="Hand-picked heroes from the Astropia team." link={{ label: 'See all featured', href: '#' }} />
+    <SectionHeader title="Featured this month" subtitle="Hand-picked heroes from the Astropia team." link={{ label: 'See all featured', href: '#', color: 'pink' }} />
     <div class="featured__row">{items.map((item) => <FeaturedCard item={item} />)}</div>
   </div>
 </section>

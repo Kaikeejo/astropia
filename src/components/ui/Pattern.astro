@@ -21,13 +21,15 @@ const { d, filled } = patternPath(name);
 </div>
 
 <style>
+  /* thumbnail bg (RGB numbers): defaults to --color-well #0a0b10; the vignette fades to the same colour */
   .pattern {
+    --pattern-bg: var(--pattern-bg-override, 10 11 16);
     position: absolute;
     inset: 0;
     overflow: hidden;
     border: 1px solid var(--color-border);
     border-radius: inherit;
-    background: var(--color-well);
+    background: rgb(var(--pattern-bg));
   }
   /* the 640x400 canvas is centered and cropped, never stretched */
   .pattern__canvas {
@@ -46,9 +48,9 @@ const { d, filled } = patternPath(name);
     inset: 0;
     background: radial-gradient(
       ellipse 50% 50% at 50% 50%,
-      rgb(10 11 16 / 0) 0%,
-      rgb(10 11 16 / 0.35) 55%,
-      rgb(10 11 16 / 0.95) 100%
+      rgb(var(--pattern-bg) / 0) 0%,
+      rgb(var(--pattern-bg) / 0.35) 55%,
+      rgb(var(--pattern-bg) / 0.95) 100%
     );
   }
   /* vignette sized to the thumbnail: lines fade out toward every edge */
@@ -57,10 +59,10 @@ const { d, filled } = patternPath(name);
     inset: 0;
     background: radial-gradient(
       ellipse 60% 60% at 50% 50%,
-      rgb(10 11 16 / 0) 0%,
-      rgb(10 11 16 / 0.1) 30%,
-      rgb(10 11 16 / 0.75) 70%,
-      rgb(10 11 16 / 1) 100%
+      rgb(var(--pattern-bg) / 0) 0%,
+      rgb(var(--pattern-bg) / 0.1) 30%,
+      rgb(var(--pattern-bg) / 0.75) 70%,
+      rgb(var(--pattern-bg) / 1) 100%
     );
   }
 </style>

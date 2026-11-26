@@ -26,6 +26,7 @@ const featured = defineCollection({
     headline: z.string(),
     description: z.string(),
     file: z.string(),
+    accent: z.enum(['blue', 'pink']).default('blue'), // card glow + Learn more colour
     pattern,
     order: z.number(),
   }),
