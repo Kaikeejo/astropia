@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import SectionHeader from '../ui/SectionHeader.astro';
+import SpotlightCard from '../cards/SpotlightCard.astro';
+const [author] = (await getCollection('spotlight')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<section class="section" id="authors">
+  <div class="container spotlight">
+    <SectionHeader align="center" title="Author spotlight" subtitle="Celebrating the creators behind your favorite Astro heroes." />
+    {author && <SpotlightCard author={author} />}
+  </div>
+</section>
+
+<style>
+  .spotlight { display: flex; flex-direction: column; gap: var(--space-48); }
+</style>

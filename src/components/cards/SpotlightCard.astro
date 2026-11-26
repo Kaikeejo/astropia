@@ -1,0 +1,41 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Pattern from '../ui/Pattern.astro';
+import Button from '../ui/Button.astro';
+
+interface Props { author: CollectionEntry<'spotlight'> }
+const { name, initials, role, patterns } = Astro.props.author.data;
+---
+
+<article class="spotlight-card gradient-border">
+  <div class="spotlight-card__items">
+    {patterns.map((p) => <a class="spotlight-card__item" href="#"><Pattern name={p} /></a>)}
+  </div>
+  <div class="spotlight-card__bar">
+    <span class="spotlight-card__avatar h4">{initials}</span>
+    <div class="spotlight-card__info">
+      <h3 class="h3">{name}</h3>
+      <p class="h5 muted">{role}</p>
+    </div>
+    <Button type="secondary" size="large">Follow</Button>
+  </div>
+</article>
+
+<style>
+  .spotlight-card {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .spotlight-card__items { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-8); }
+  .spotlight-card__item { position: relative; height: 280px; overflow: hidden; }
+  .spotlight-card__item:hover :global(.pattern__canvas) { scale: 1.08; }
+  .spotlight-card__bar { display: flex; align-items: center; gap: var(--space-24); padding: var(--space-32) var(--space-40); }
+  .spotlight-card__avatar {
+    display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; flex: none;
+    background: var(--color-blue); color: var(--color-text);
+  }
+  .spotlight-card__info { flex: 1; }
+</style>

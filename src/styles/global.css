@@ -1,0 +1,54 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--color-bg); color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+p, h1, h2, h3, h4, h5, h6 { margin: 0; }
+
+/* ---- Text styles (Figma: H1-H6, Paragraph, Accent) ---- */
+.h1 { font-family: var(--font-heading); font-weight: 600; font-size: 72px; line-height: 80px; letter-spacing: -0.025em; }
+.h2 { font-family: var(--font-heading); font-weight: 600; font-size: 48px; line-height: 56px; letter-spacing: -0.02em; }
+.h3 { font-family: var(--font-heading); font-weight: 600; font-size: 32px; line-height: 40px; letter-spacing: -0.015em; }
+.h4 { font-family: var(--font-heading); font-weight: 600; font-size: 24px; line-height: 32px; letter-spacing: -0.01em; }
+.h5 { font-family: var(--font-heading); font-weight: 400; font-size: 18px; line-height: 32px; letter-spacing: -0.005em; }
+.h6 { font-family: var(--font-heading); font-weight: 600; font-size: 16px; line-height: 24px; letter-spacing: -0.005em; }
+.paragraph { font-family: var(--font-body); font-weight: 400; font-size: 16px; line-height: 24px; }
+.accent { font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 16px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.muted { color: var(--color-text-muted); }
+.blue { color: var(--color-blue); }
+
+@media (max-width: 720px) {
+  .h1 { font-size: 48px; line-height: 56px; }
+  .h2 { font-size: 32px; line-height: 40px; }
+}
+
+/* ---- Layout ---- */
+.section { padding: var(--section-pad) var(--gutter); }
+.container { width: 100%; max-width: var(--container); margin: 0 auto; }
+
+/* gradient border helper: 1px pink -> blue */
+.gradient-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--gb-fill, var(--color-surface)), var(--gb-fill, var(--color-surface))) padding-box,
+    var(--gradient-border) border-box;
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

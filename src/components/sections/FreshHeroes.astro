@@ -1,0 +1,64 @@
+---
+import { getCollection } from 'astro:content';
+import Chip from '../ui/Chip.astro';
+import Icon from '../ui/Icon.astro';
+import HeroCard from '../cards/HeroCard.astro';
+const heroes = (await getCollection('heroes')).sort((a, b) => a.data.order - b.data.order);
+const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro animation'];
+---
+
+<section class="section fresh" id="heroes">
+  <div class="container fresh__inner">
+    <div class="fresh__filters">
+      <div class="fresh__chips" role="group" aria-label="Filter heroes">
+        {filters.map((f, i) => <Chip value={f} active={i === 0}>{f}</Chip>)}
+      </div>
+      <button type="button" class="fresh__sort paragraph">Sort: Popular <Icon name="chevron-down" size={16} /></button>
+    </div>
+    <div class="fresh__grid">
+      {heroes.map((hero) => <HeroCard hero={hero} />)}
+    </div>
+    <p class="fresh__empty paragraph muted" hidden>No heroes in this category yet.</p>
+    <a class="fresh__all h6 blue" href="#heroes">View all<Icon name="arrow-right" /></a>
+  </div>
+</section>
+
+<style>
+  .fresh__inner { display: flex; flex-direction: column; gap: var(--space-32); }
+  .fresh__filters { display: flex; align-items: center; gap: var(--space-16); }
+  .fresh__chips { flex: 1; display: flex; flex-wrap: wrap; gap: var(--space-8); }
+  .fresh__sort {
+    display: inline-flex; align-items: center; gap: var(--space-8);
+    padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px);
+    border-radius: var(--radius-full); border: 1px solid var(--color-border); background: var(--color-surface);
+    cursor: pointer; color: var(--color-text);
+  }
+  .fresh__sort :global(svg) { color: var(--color-text-muted); }
+  .fresh__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
+  .fresh__all { display: inline-flex; align-items: center; gap: var(--space-8); align-self: flex-end; }
+  .fresh__all :global(svg) { transition: translate var(--dur) var(--ease); }
+  .fresh__all:hover :global(svg) { translate: 4px 0; }
+  @media (max-width: 1100px) { .fresh__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .fresh__grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  // Filter chips: show only cards in the chosen category.
+  const section = document.querySelector<HTMLElement>('.fresh');
+  if (section) {
+    const chips = section.querySelectorAll<HTMLButtonElement>('[data-filter]');
+    const cards = section.querySelectorAll<HTMLElement>('[data-category]');
+    const empty = section.querySelector<HTMLElement>('.fresh__empty')!;
+    chips.forEach((chip) => chip.addEventListener('click', () => {
+      const f = chip.dataset.filter;
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      let shown = 0;
+      cards.forEach((card) => {
+        const match = f === 'All' || card.dataset.category === f;
+        card.hidden = !match;
+        if (match) shown++;
+      });
+      empty.hidden = shown > 0;
+    }));
+  }
+</script>

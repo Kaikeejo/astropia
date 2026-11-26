@@ -1,0 +1,45 @@
+---
+// Pixel-art icons (Figma: Icon/pixel-mark, Icon/pixel-arrow).
+// Each cell: a number = opacity of --color-blue, 'w' = white highlight, 0 = empty.
+type Cell = number | 'w';
+const icons: Record<string, { map: Cell[][]; cell: number; step: number; size: number; offsetY?: number }> = {
+  mark: {
+    cell: 4, step: 6, size: 22,
+    map: [
+      [0, 0.35, 1, 0],
+      [0.6, 1, 'w', 0.5],
+      [0, 0.8, 1, 0.25],
+      [0.2, 0, 0.55, 0],
+    ],
+  },
+  arrow: {
+    cell: 5, step: 7, size: 40, offsetY: 3,
+    map: [
+      [0, 0.2, 0, 1, 0, 0],
+      [0, 0, 0, 0.55, 1, 0],
+      [0.25, 0.45, 0.7, 0.9, 'w', 1],
+      [0, 0, 0, 0.55, 1, 0],
+      [0, 0, 0.15, 1, 0, 0.3],
+    ],
+  },
+};
+
+interface Props { name: 'mark' | 'arrow'; class?: string }
+const { name, class: cls } = Astro.props;
+const { map, cell, step, size, offsetY = 0 } = icons[name];
+---
+
+<svg class:list={['pixel-icon', cls]} width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
+  {map.flatMap((row, r) => row.map((v, c) => v ? (
+    <rect
+      x={c * step}
+      y={r * step + offsetY}
+      width={cell}
+      height={cell}
+      rx="1"
+      fill={v === 'w' ? 'var(--color-text)' : 'var(--color-blue)'}
+      opacity={v === 'w' ? 1 : v}
+      style={`--i:${r * row.length + c}`}
+    />
+  ) : null))}
+</svg>

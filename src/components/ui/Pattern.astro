@@ -1,0 +1,62 @@
+---
+import { patternPath, W, H, type PatternName } from '../../lib/patterns';
+
+interface Props {
+  name: PatternName;
+  /** add the thumbnail-sized vignette (used on smaller cards) */
+  vignette?: boolean;
+}
+const { name, vignette = true } = Astro.props;
+const { d, filled } = patternPath(name);
+---
+
+<div class="pattern" aria-hidden="true">
+  <div class="pattern__canvas">
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none">
+      {filled ? <path d={d} fill="var(--color-blue)" /> : <path d={d} stroke="var(--color-blue)" stroke-width="1" />}
+    </svg>
+    <div class="pattern__fade"></div>
+  </div>
+  {vignette && <div class="pattern__vignette"></div>}
+</div>
+
+<style>
+  .pattern {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--color-surface-2);
+  }
+  /* the 640x400 canvas is centered and cropped, never stretched */
+  .pattern__canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 640px;
+    height: 400px;
+    translate: -50% -50%;
+    transition: scale 600ms var(--ease);
+  }
+  .pattern__fade {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      rgb(24 28 38 / 0) 0%,
+      rgb(24 28 38 / 0.35) 55%,
+      rgb(24 28 38 / 0.95) 100%
+    );
+  }
+  .pattern__vignette {
+    position: absolute;
+    inset: 0;
+    opacity: 0.5;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      rgb(24 28 38 / 0) 0%,
+      rgb(24 28 38 / 0.15) 35%,
+      rgb(24 28 38 / 0.7) 70%,
+      rgb(24 28 38 / 1) 100%
+    );
+  }
+</style>

@@ -1,0 +1,54 @@
+---
+// The hero starfield. Same deterministic layout as the Figma "Starfield" layer
+// (seeded random, so it never changes between builds).
+const W = 1440, H = 456;
+type Star = { x: number; y: number; s: number; o: number; blue: boolean; bright: boolean };
+const stars: Star[] = [];
+const inContent = (x: number, y: number) => x > 360 && x < 1080 && y > 72 && y < 384;
+function batch(seed0: number, count: number, skip: number, baseOp: number, spread: number) {
+  let seed = seed0;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let added = 0, attempts = 0;
+  while (added < count && attempts < 1000) {
+    attempts++;
+    const x = rnd() * W, y = rnd() * H;
+    if (inContent(x, y) && rnd() < skip) continue;
+    const bright = rnd() < 0.08;
+    const s = bright ? 3 : rnd() < (seed0 === 42 ? 0.7 : 0.6) ? 1 : 2;
+    const blue = rnd() < 0.25;
+    const o = bright ? 0.9 : baseOp + rnd() * spread;
+    stars.push({ x: Math.round(x), y: Math.round(y), s, o, blue, bright });
+    added++;
+  }
+}
+batch(42, 70, 0.8, 0.15, 0.35);
+batch(1337, 110, 0.6, 0.25, 0.4);
+---
+
+<svg class="starfield" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <filter id="star-glow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="2.5" />
+      <feColorMatrix values="0 0 0 0 0.6  0 0 0 0 0.75  0 0 0 0 1  0 0 0 0.9 0" />
+      <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </defs>
+  {stars.map((st, i) => (
+    <circle
+      cx={st.x + st.s / 2}
+      cy={st.y + st.s / 2}
+      r={st.s / 2}
+      fill={st.blue ? '#cfe0ff' : '#ffffff'}
+      opacity={st.o.toFixed(2)}
+      filter={st.bright ? 'url(#star-glow)' : undefined}
+      class:list={[{ twinkle: st.bright || i % 9 === 0 }]}
+      style={`--d:${(i % 7) * 0.6}s`}
+    />
+  ))}
+</svg>
+
+<style>
+  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .twinkle { animation: twinkle 4.2s ease-in-out infinite; animation-delay: var(--d); }
+  @keyframes twinkle { 50% { opacity: 0.25; } }
+</style>

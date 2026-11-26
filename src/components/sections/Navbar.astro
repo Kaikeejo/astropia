@@ -1,0 +1,42 @@
+---
+import PixelIcon from '../ui/PixelIcon.astro';
+import Icon from '../ui/Icon.astro';
+import Button from '../ui/Button.astro';
+const links = ['Explore', 'Heroes', 'Categories', 'Authors', 'Pricing'];
+---
+
+<header class="navbar">
+  <a class="logo h6" href="/"><PixelIcon name="mark" />Astropia</a>
+  <nav class="navbar__links" aria-label="Main">
+    {links.map((l, i) => <a class:list={['paragraph', { 'is-active': i === 0 }]} href={`#${l.toLowerCase()}`}>{l}</a>)}
+  </nav>
+  <button type="button" class="navbar__search paragraph muted">
+    <Icon name="search" size={16} />Search<kbd class="accent">⌘K</kbd>
+  </button>
+  <Button type="secondary" size="small" href="#">Sign in</Button>
+  <Button type="primary" size="small" href="#">Get started</Button>
+</header>
+
+<style>
+  .navbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: var(--space-32);
+    padding: var(--space-16) var(--gutter);
+    background: rgb(9 11 17 / 0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .logo { display: flex; align-items: center; gap: var(--space-8); }
+  .navbar__links { flex: 1; display: flex; justify-content: center; gap: var(--space-32); }
+  .navbar__links a { color: var(--color-text-muted); transition: color var(--dur) var(--ease); }
+  .navbar__links a:hover, .navbar__links a.is-active { color: var(--color-text); }
+  .navbar__search {
+    display: flex; align-items: center; gap: var(--space-8);
+    padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px);
+    border-radius: var(--radius-full); border: 1px solid var(--color-border); background: var(--color-surface);
+    cursor: pointer; transition: border-color var(--dur) var(--ease);
+  }
+  .navbar__search:hover { border-color: var(--color-border-strong); }
+  kbd { font-size: 11px; letter-spacing: 0; }
+  @media (max-width: 960px) { .navbar__links, .navbar__search { display: none; } .logo { flex: 1; } }
+</style>

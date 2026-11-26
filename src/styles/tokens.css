@@ -1,0 +1,61 @@
+/*
+ * Astropia design tokens. Mirrors the Figma variables and styles one-to-one:
+ * change a value here and the whole site updates.
+ */
+:root {
+  /* color/* */
+  --color-bg: #090b11;
+  --color-surface: #11141c;
+  --color-surface-2: #181c26;
+  --color-border: #232836;
+  --color-border-strong: #343b4d;
+  --color-text: #f3f5f9;
+  --color-text-muted: #9aa3b8;
+  --color-blue: #4c8dff;
+  --color-blue-strong: #2563eb;
+  --color-pink: #d92875;
+  --color-cyan: #22d3ee;
+  --color-overlay: #05060a;
+
+  /* Gradient styles */
+  --gradient-button: linear-gradient(90deg, #d92875, #2563eb);
+  --gradient-border: linear-gradient(90deg, rgb(217 40 117 / 0.9), rgb(76 141 255 / 0.9));
+
+  /* space/* */
+  --space-8: 8px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-120: 120px;
+
+  /* radius/* */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  /* fonts */
+  --font-heading: 'Sora Variable', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* layout */
+  --container: 1200px;
+  --gutter: var(--space-120);
+  --section-pad: var(--space-96);
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 220ms;
+}
+
+@media (max-width: 1200px) {
+  :root { --gutter: var(--space-48); }
+}
+@media (max-width: 720px) {
+  :root { --gutter: var(--space-24); --section-pad: var(--space-64); }
+}

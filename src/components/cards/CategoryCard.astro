@@ -1,0 +1,43 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Pattern from '../ui/Pattern.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props { category: CollectionEntry<'categories'> }
+const { name, count, pattern } = Astro.props.category.data;
+---
+
+<a class="category-card" href={`#${Astro.props.category.id}`}>
+  <div class="category-card__thumb"><Pattern name={pattern} /></div>
+  <div class="category-card__body">
+    <div class="category-card__text">
+      <h3 class="h6">{name}</h3>
+      <p class="paragraph muted">{count} heroes</p>
+    </div>
+    <Icon name="arrow-right" class="category-card__arrow" />
+  </div>
+</a>
+
+<style>
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .category-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-border-strong);
+    box-shadow: 0 16px 40px -16px rgb(37 99 235 / 0.35);
+  }
+  .category-card__thumb { position: relative; height: 160px; border-radius: 12px; overflow: hidden; }
+  .category-card:hover :global(.pattern__canvas) { scale: 1.06; }
+  .category-card__body { display: flex; align-items: center; gap: var(--space-16); padding: var(--space-8); }
+  .category-card__text { flex: 1; }
+  .category-card :global(.category-card__arrow) { color: var(--color-text-muted); transition: translate var(--dur) var(--ease), color var(--dur) var(--ease); }
+  .category-card:hover :global(.category-card__arrow) { translate: 4px 0; color: var(--color-blue); }
+</style>

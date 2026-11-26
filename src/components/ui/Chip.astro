@@ -1,0 +1,21 @@
+---
+interface Props { active?: boolean; value: string }
+const { active = false, value } = Astro.props;
+---
+
+<button type="button" class="chip paragraph" data-filter={value} aria-pressed={active ? 'true' : 'false'}><slot /></button>
+
+<style>
+  .chip {
+    padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .chip:hover { color: var(--color-text); border-color: var(--color-border-strong); }
+  .chip[aria-pressed='true'] { background: var(--color-blue-strong); border-color: var(--color-blue-strong); color: var(--color-text); }
+  .chip:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+</style>

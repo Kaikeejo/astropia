@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/sections/Navbar.astro';
+import Hero from '../components/sections/Hero.astro';
+import FreshHeroes from '../components/sections/FreshHeroes.astro';
+import Featured from '../components/sections/Featured.astro';
+import Categories from '../components/sections/Categories.astro';
+import Newsletter from '../components/sections/Newsletter.astro';
+import AuthorSpotlight from '../components/sections/AuthorSpotlight.astro';
+import Footer from '../components/sections/Footer.astro';
+import QuickPreview from '../components/sections/QuickPreview.astro';
+---
+
+<Base title="Astropia: animated heroes for Astro">
+  <Navbar />
+  <main>
+    <Hero />
+    <FreshHeroes />
+    <Featured />
+    <Categories />
+    <Newsletter />
+    <AuthorSpotlight />
+  </main>
+  <Footer />
+  <QuickPreview />
+</Base>

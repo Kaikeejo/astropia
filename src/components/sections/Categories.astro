@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import SectionHeader from '../ui/SectionHeader.astro';
+import CategoryCard from '../cards/CategoryCard.astro';
+const categories = (await getCollection('categories')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<section class="section" id="categories">
+  <div class="container categories">
+    <SectionHeader title="Browse by category" subtitle="Find the right effect for your next landing page." link={{ label: 'All categories', href: '#' }} />
+    <div class="categories__grid">{categories.map((c) => <CategoryCard category={c} />)}</div>
+  </div>
+</section>
+
+<style>
+  .categories { display: flex; flex-direction: column; gap: var(--space-32); }
+  .categories__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-24); }
+  @media (max-width: 1100px) { .categories__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>

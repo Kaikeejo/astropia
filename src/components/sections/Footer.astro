@@ -1,0 +1,50 @@
+---
+import PixelIcon from '../ui/PixelIcon.astro';
+const columns = [
+  { title: 'Product', links: ['Heroes', 'Categories', 'Authors', 'Pricing'] },
+  { title: 'Resources', links: ['Docs', 'Astro guide', 'Changelog', 'Licenses'] },
+  { title: 'Company', links: ['About', 'Blog', 'Contact', 'Careers'] },
+];
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__columns">
+      <div class="footer__brand">
+        <a class="logo h6" href="/"><PixelIcon name="mark" />Astropia</a>
+        <p class="paragraph muted">Animated, copy-paste hero sections for Astro. Built with three.js, tuned for speed.</p>
+      </div>
+      <div class="footer__links">
+        {columns.map((col) => (
+          <div class="footer__col">
+            <h3 class="h6">{col.title}</h3>
+            {col.links.map((l) => <a class="paragraph muted" href="#">{l}</a>)}
+          </div>
+        ))}
+      </div>
+    </div>
+    <hr />
+    <div class="footer__bottom paragraph muted">
+      <p>© {new Date().getFullYear()} Astropia. All rights reserved.</p>
+      <nav aria-label="Legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a></nav>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding: var(--space-64) var(--gutter); border-top: 1px solid var(--color-border); }
+  .footer__inner { display: flex; flex-direction: column; gap: var(--space-48); }
+  .footer__columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-24); }
+  .footer__brand { display: flex; flex-direction: column; gap: var(--space-16); }
+  .footer__brand p { max-width: 384px; }
+  .logo { display: flex; align-items: center; gap: var(--space-8); }
+  .footer__links { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-24); }
+  .footer__col { display: flex; flex-direction: column; gap: var(--space-16); }
+  .footer a.muted, .footer__bottom a { transition: color var(--dur) var(--ease); }
+  .footer a.muted:hover, .footer__bottom a:hover { color: var(--color-text); }
+  hr { border: 0; height: 1px; background: var(--color-border); margin: 0; }
+  .footer__bottom { display: flex; align-items: center; gap: var(--space-24); }
+  .footer__bottom p { flex: 1; }
+  .footer__bottom nav { display: flex; gap: var(--space-24); }
+  @media (max-width: 800px) { .footer__columns { grid-template-columns: 1fr; } }
+</style>

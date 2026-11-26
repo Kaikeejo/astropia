@@ -1,0 +1,10 @@
+[
+  {"id": "space", "name": "Space", "count": 24, "pattern": "circles", "order": 1},
+  {"id": "particles", "name": "Particles", "count": 18, "pattern": "dots", "order": 2},
+  {"id": "3d-scenes", "name": "3D scenes", "count": 14, "pattern": "wavy", "order": 3},
+  {"id": "shaders", "name": "Shaders", "count": 11, "pattern": "angled", "order": 4},
+  {"id": "waves", "name": "Waves", "count": 8, "pattern": "horizon", "order": 5},
+  {"id": "starfields", "name": "Starfields", "count": 9, "pattern": "grid", "order": 6},
+  {"id": "planets", "name": "Planets", "count": 7, "pattern": "rays", "order": 7},
+  {"id": "motion", "name": "Motion", "count": 12, "pattern": "squares", "order": 8}
+]

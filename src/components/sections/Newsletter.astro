@@ -1,0 +1,70 @@
+---
+import Icon from '../ui/Icon.astro';
+import PixelIcon from '../ui/PixelIcon.astro';
+---
+
+<section class="newsletter">
+  <div class="newsletter__inner">
+    <p class="newsletter__message h5 muted"><Icon name="send" class="newsletter__send" />More heroes coming soon. Stay in the loop!</p>
+    <form class="newsletter__form" data-newsletter>
+      <div class="email-wrap">
+      <span class="email__glow" aria-hidden="true"></span>
+      <div class="email">
+        <label class="sr-only" for="email">Email address</label>
+        <input id="email" class="paragraph" type="email" required placeholder="Enter your email" />
+        <button type="submit" class="email__submit" aria-label="Subscribe"><PixelIcon name="arrow" /></button>
+      </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .newsletter {
+    padding: var(--space-48) var(--gutter);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .newsletter__inner { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-24); align-items: center; }
+  .newsletter__message { display: flex; align-items: center; gap: var(--space-16); }
+  .newsletter__message :global(.newsletter__send) { color: var(--color-text); flex: none; }
+
+  .email-wrap { position: relative; isolation: isolate; }
+  .email {
+    position: relative;
+    display: flex; align-items: center; gap: var(--space-16);
+    height: 64px;
+    padding: var(--space-8) var(--space-16) var(--space-8) var(--space-24);
+    border-radius: 32px;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+      var(--gradient-border) border-box;
+  }
+  .email__glow {
+    position: absolute; inset: 0; z-index: -1; border-radius: 32px;
+    background: linear-gradient(90deg, rgb(217 40 117 / 0.45), rgb(76 141 255 / 0.45));
+    filter: blur(24px);
+    transition: opacity var(--dur) var(--ease);
+    opacity: 0.8;
+  }
+  .email-wrap:focus-within .email__glow { opacity: 1; }
+  .email input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--color-text); }
+  .email input::placeholder { color: var(--color-blue); }
+  .email__submit { display: grid; place-items: center; width: 48px; height: 48px; background: none; border: 0; cursor: pointer; }
+  .email__submit :global(rect) { transition: opacity 300ms var(--ease), translate 300ms var(--ease); }
+  .email__submit:hover :global(rect) { translate: 3px 0; transition-delay: calc(var(--i) * 12ms); }
+
+  @media (max-width: 800px) { .newsletter__inner { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-newsletter]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = form.querySelector('input')!;
+      input.value = '';
+      input.placeholder = 'Thanks! You’re on the list.';
+    });
+  });
+</script>

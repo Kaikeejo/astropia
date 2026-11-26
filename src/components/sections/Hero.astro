@@ -1,0 +1,49 @@
+---
+import Starfield from '../ui/Starfield.astro';
+import Icon from '../ui/Icon.astro';
+---
+
+<section class="hero section" id="explore">
+  <Starfield />
+  <div class="hero__glow" aria-hidden="true"></div>
+  <h1 class="h1">Astro Resources</h1>
+  <p class="h5 muted hero__lead">Tweak 3D and particle hero sections live, then copy one component straight into your Astro project.</p>
+  <label class="hero__search gradient-border">
+    <Icon name="search" />
+    <span class="sr-only">Search</span>
+    <input class="paragraph" type="search" placeholder="Search heroes, effects, authors…" />
+    <kbd class="accent muted">⌘K</kbd>
+  </label>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: var(--space-32);
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero > :not(.starfield, .hero__glow) { position: relative; }
+  .hero__glow {
+    position: absolute; left: 50%; top: -120px; width: 900px; height: 480px; translate: -50% 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(77 115 255 / 0.35), rgb(76 141 255 / 0.12) 50%, transparent);
+    filter: blur(80px);
+    pointer-events: none;
+  }
+  .hero__lead { max-width: 640px; }
+  .hero__search {
+    --gb-fill: var(--color-surface);
+    display: flex; align-items: center; gap: var(--space-16);
+    width: 100%; max-width: 640px;
+    padding: calc(var(--space-16) - 1px) calc(var(--space-24) - 1px);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    cursor: text;
+    transition: box-shadow var(--dur) var(--ease);
+  }
+  .hero__search:focus-within { box-shadow: 0 0 0 4px rgb(76 141 255 / 0.15), 0 0 32px rgb(217 40 117 / 0.15); }
+  .hero__search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--color-text); }
+  .hero__search input::placeholder { color: var(--color-text-muted); }
+  kbd { font-size: 11px; letter-spacing: 0; }
+</style>

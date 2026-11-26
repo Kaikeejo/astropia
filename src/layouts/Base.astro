@@ -1,0 +1,75 @@
+---
+import '@fontsource-variable/sora';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+
+interface Props { title: string; description?: string }
+const { title, description = 'Animated, copy-paste hero sections for Astro.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <div class="toast paragraph" role="status" aria-live="polite" hidden></div>
+  </body>
+</html>
+
+<style is:global>
+  .toast {
+    position: fixed; left: 50%; bottom: var(--space-32); translate: -50% 0; z-index: 50;
+    padding: var(--space-8) var(--space-16); border-radius: var(--radius-full);
+    background: var(--color-surface-2); border: 1px solid var(--color-border-strong);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+  }
+</style>
+
+<script>
+  // Shared bits of interactivity: likes (remembered in this browser) and copy buttons.
+  const toast = document.querySelector<HTMLElement>('.toast')!;
+  let t: number | undefined;
+  const say = (msg: string) => {
+    toast.textContent = msg; toast.hidden = false;
+    clearTimeout(t); t = window.setTimeout(() => (toast.hidden = true), 1800);
+  };
+
+  const liked = new Set<string>(JSON.parse(localStorage.getItem('astropia:likes') ?? '[]'));
+  document.querySelectorAll<HTMLButtonElement>('[data-like]').forEach((btn) => {
+    const card = btn.closest('article');
+    const id = card?.querySelector<HTMLElement>('[data-preview]')?.dataset.preview ?? '';
+    const count = btn.querySelector('[data-count]')!;
+    const base = Number(count.textContent);
+    const render = () => {
+      const on = liked.has(id);
+      btn.setAttribute('aria-pressed', String(on));
+      count.textContent = String(base + (on ? 1 : 0));
+    };
+    render();
+    btn.addEventListener('click', () => {
+      liked.has(id) ? liked.delete(id) : liked.add(id);
+      localStorage.setItem('astropia:likes', JSON.stringify([...liked]));
+      render();
+    });
+  });
+
+  const copy = async (text: string) => {
+    try { await navigator.clipboard.writeText(text); say('Copied to clipboard'); } catch { say('Copy failed'); }
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const name = (btn.dataset.copy ?? 'Hero').replace(/\s+/g, '');
+      copy(`<${name}>\n  <h1>Your headline</h1>\n</${name}>`);
+    }));
+  document.querySelector('[data-qp-copy]')?.addEventListener('click', () => {
+    const name = (document.querySelector('[data-qp-title]')?.textContent ?? 'Hero').replace(/\s+/g, '');
+    copy(`<${name}>\n  <h1>Your headline</h1>\n</${name}>`);
+  });
+</script>
