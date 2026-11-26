@@ -48,7 +48,7 @@
   --font-body: 'Inter Variable', system-ui, sans-serif;
 
   /* layout */
-  --container: 80rem;
+  --container: 75rem;
   --gutter: var(--space-120);
   --section-pad: var(--space-96);
 
