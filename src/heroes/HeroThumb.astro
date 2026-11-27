@@ -15,15 +15,14 @@ const { engine, settings = {} } = Astro.props;
 </style>
 
 <script>
-  import { mount } from './pixel-field/engine';
-  const thumbs = document.querySelectorAll<HTMLElement>('[data-hero-thumb]');
+  import { mountHero } from './registry';
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (!e.isIntersecting) continue;
       const el = e.target as HTMLElement;
       io.unobserve(el);
-      if (el.dataset.heroThumb === 'pixel-field') mount(el, JSON.parse(el.dataset.settings || '{}'), { still: true, fit: true });
+      mountHero(el.dataset.heroThumb!, el, JSON.parse(el.dataset.settings || '{}'), { still: true, fit: true });
     }
   }, { rootMargin: '300px' });
-  thumbs.forEach((t) => io.observe(t));
+  document.querySelectorAll<HTMLElement>('[data-hero-thumb]').forEach((t) => io.observe(t));
 </script>

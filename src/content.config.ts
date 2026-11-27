@@ -16,7 +16,7 @@ const heroes = defineCollection({
     pattern,
     likes: z.number(),
     order: z.number(),
-    engine: z.enum(['pixel-field']).optional(), // live hero: gets its own page at /heroes/<id>
+    engine: z.enum(['pixel-field', 'warp', 'constellation', 'orbits', 'nebula', 'black-hole']).optional(), // live hero: gets its own page at /heroes/<id>
     settings: z.record(z.string(), z.any()).optional(), // engine settings (preset) for this hero
   }),
 });

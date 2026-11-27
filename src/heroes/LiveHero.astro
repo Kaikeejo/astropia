@@ -1,0 +1,22 @@
+---
+// <LiveHero engine="warp" settings={{...}} /> : any animated hero background.
+// Transparent (no background colour), fills its parent: give the parent `position: relative`.
+interface Props { engine: string; settings?: Record<string, unknown>; id?: string; class?: string }
+const { engine, settings = {}, id, class: cls } = Astro.props;
+---
+
+<div id={id} class:list={['live-hero', cls]} data-live-hero={engine} data-settings={JSON.stringify(settings)} aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .live-hero { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .live-hero canvas { display: block; width: 100%; height: 100%; }
+</style>
+
+<script>
+  import { mountHero, type HeroEl } from './registry';
+  document.querySelectorAll<HeroEl>('[data-live-hero]').forEach((el) => {
+    el.heroReady = mountHero(el.dataset.liveHero!, el, JSON.parse(el.dataset.settings || '{}')).then((h) => (el.hero = h));
+  });
+</script>

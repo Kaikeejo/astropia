@@ -1,3 +1,5 @@
+import type { Ctrl } from '../runtime';
+
 // Pixel Field hero: the Astropia pixel thumbnails as a live, animated, transparent hero background.
 // Plain Canvas 2D (no three.js needed). Every setting below is a prop on <PixelField /> and a control
 // in the playground. Generation (which pixels exist) and drawing (how they look each frame) are separate,
@@ -43,6 +45,37 @@ export const DEFAULTS: PixelFieldSettings = {
   drift: 0, driftAngle: 0,
   mouse: 'glow', mouseRadius: 160,
 };
+
+// Controls shown in the playground panel (the pattern is fixed per card, so it isn't here).
+export const CONTROLS: Ctrl[] = [
+  { group: 'Design' },
+  { key: 'seed', label: 'Seed', type: 'range', min: 1, max: 999, step: 1 },
+  { key: 'density', label: 'Amount', type: 'range', min: 0.1, max: 2, step: 0.05 },
+  { key: 'scale', label: 'Design size', type: 'range', min: 0.4, max: 3, step: 0.05 },
+  { key: 'focusX', label: 'Position X', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'focusY', label: 'Position Y', type: 'range', min: 0, max: 1, step: 0.01 },
+  { group: 'Colour' },
+  { key: 'colors', label: 'Colours', type: 'colors' },
+  { key: 'colorMode', label: 'Colour mode', type: 'select', options: ['mixed', 'split', 'solo'] },
+  { key: 'highlights', label: 'White pixels', type: 'range', min: 0, max: 40, step: 1 },
+  { group: 'Pixels' },
+  { key: 'pixelSize', label: 'Pixel size', type: 'range', min: 1, max: 16, step: 1 },
+  { key: 'gap', label: 'Gap', type: 'range', min: 0, max: 12, step: 1 },
+  { key: 'opacityMin', label: 'Opacity min', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'opacityMax', label: 'Opacity max', type: 'range', min: 0, max: 1, step: 0.01 },
+  { group: 'Edges' },
+  { key: 'vignette', label: 'Vignette', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'vignetteSize', label: 'Vignette size', type: 'range', min: 0.2, max: 1.5, step: 0.01 },
+  { key: 'fadeTop', label: 'Fade top', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'fadeBottom', label: 'Fade bottom', type: 'range', min: 0, max: 1, step: 0.01 },
+  { group: 'Motion' },
+  { key: 'twinkle', label: 'Twinkle', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'twinkleSpeed', label: 'Twinkle speed', type: 'range', min: 0, max: 3, step: 0.05 },
+  { key: 'drift', label: 'Drift', type: 'range', min: -60, max: 60, step: 1 },
+  { key: 'driftAngle', label: 'Drift angle', type: 'range', min: 0, max: 360, step: 1 },
+  { key: 'mouse', label: 'Mouse', type: 'select', options: ['none', 'glow', 'repel'] },
+  { key: 'mouseRadius', label: 'Mouse radius', type: 'range', min: 40, max: 400, step: 5 },
+];
 
 // ---------------------------------------------------------------- generation
 type Put = (c: number, r: number, o: number) => void;

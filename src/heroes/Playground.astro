@@ -1,0 +1,150 @@
+---
+// Playground for any live hero: the hero full size with a live controls panel built from the
+// engine's controls list. Used by src/pages/heroes/[id].astro for every card that has an engine.
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/sections/Navbar.astro';
+import Button from '../components/ui/Button.astro';
+import LiveHero from './LiveHero.astro';
+import { CATALOG } from './catalog';
+
+interface Props { title: string; engine: string; settings?: Record<string, unknown> }
+const { title, engine, settings = {} } = Astro.props;
+const { defaults, controls } = CATALOG[engine];
+const preset = { ...defaults, ...settings };
+---
+
+<Base title={`${title}: Astropia hero playground`}>
+  <Navbar />
+  <main class="pg">
+    <section class="pg__stage" data-stage>
+      <LiveHero id="pf" engine={engine} settings={preset} />
+      <div class="pg__copy">
+        <span class="tag">{title}</span>
+        <h1>Build something out of this world</h1>
+        <p class="paragraph">A sample headline so you can judge the background behind real content. Tweak the controls, then copy the settings.</p>
+        <div class="pg__ctas">
+          <Button>Get started</Button>
+          <Button type="secondary">Learn more</Button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel" data-panel>
+      <header class="panel__head">
+        <strong>Controls</strong>
+        <div class="panel__actions">
+          <button class="btn-raised panel__btn" data-shuffle title="New random seed">Shuffle</button>
+          <button class="btn-raised panel__btn" data-reset>Reset</button>
+          <button class="btn-raised panel__btn panel__toggle" data-toggle aria-expanded="true" aria-label="Hide controls">–</button>
+        </div>
+      </header>
+      <form class="panel__body" data-controls onsubmit="return false"></form>
+    </aside>
+  </main>
+</Base>
+
+<script is:inline define:vars={{ preset, controls }}>window.__PG = { preset, controls };</script>
+
+<script>
+  import { resolveColor, type Ctrl, type HeroInstance } from './runtime';
+  import type { HeroEl } from './registry';
+
+  const { preset: DEFAULTS, controls: SCHEMA } = (window as any).__PG as { preset: Record<string, any>; controls: Ctrl[] };
+  const el = document.getElementById('pf') as HeroEl;
+  const form = document.querySelector<HTMLFormElement>('[data-controls]')!;
+  let hero: HeroInstance;
+  const hf = () => hero;
+  const fmt = (v: number, step: number) => (step >= 1 ? String(v) : v.toFixed(2));
+
+  function render() {
+    const S = hf().settings();
+    form.innerHTML = '';
+    for (const c of SCHEMA) {
+      if ('group' in c) { const h = document.createElement('p'); h.className = 'panel__group'; h.textContent = c.group; form.append(h); continue; }
+      const row = document.createElement('label');
+      row.className = 'ctrl';
+      const name = document.createElement('span'); name.className = 'ctrl__name'; name.textContent = c.label; row.append(name);
+      if (c.type === 'range') {
+        const out = document.createElement('output'); out.className = 'ctrl__val';
+        const input = Object.assign(document.createElement('input'), { type: 'range', min: String(c.min), max: String(c.max), step: String(c.step), value: String(S[c.key]) });
+        out.textContent = fmt(Number(S[c.key]), c.step);
+        input.addEventListener('input', () => { const v = Number(input.value); out.textContent = fmt(v, c.step); hf().update({ [c.key]: v }); });
+        row.append(out, input);
+      } else if (c.type === 'select') {
+        const sel = document.createElement('select');
+        c.options.forEach((o) => sel.append(new Option(o[0].toUpperCase() + o.slice(1), o, false, S[c.key] === o)));
+        sel.addEventListener('change', () => hf().update({ [c.key]: sel.value }));
+        row.append(sel);
+      } else {
+        const wrap = document.createElement('div'); wrap.className = 'ctrl__colors';
+        const colors = (S.colors as string[]).map(resolveColor);
+        const sync = () => hf().update({ colors: [...colors] });
+        colors.forEach((col, i) => {
+          const sw = Object.assign(document.createElement('input'), { type: 'color', value: col, title: `Colour ${i + 1}` });
+          sw.addEventListener('input', () => { colors[i] = sw.value; sync(); });
+          wrap.append(sw);
+        });
+        if (colors.length < 4) { const add = Object.assign(document.createElement('button'), { type: 'button', className: 'ctrl__mini', textContent: '+', title: 'Add colour' }); add.onclick = () => { colors.push('#ffffff'); sync(); render(); }; wrap.append(add); }
+        if (colors.length > 1) { const rm = Object.assign(document.createElement('button'), { type: 'button', className: 'ctrl__mini', textContent: '−', title: 'Remove last colour' }); rm.onclick = () => { colors.pop(); sync(); render(); }; wrap.append(rm); }
+        row.append(wrap);
+      }
+      form.append(row);
+    }
+  }
+
+  document.querySelector('[data-shuffle]')!.addEventListener('click', () => { hf().update({ seed: 1 + Math.floor(Math.random() * 999) }); render(); });
+  document.querySelector('[data-reset]')!.addEventListener('click', () => { hf().update({ ...DEFAULTS }); render(); });
+  const panel = document.querySelector<HTMLElement>('[data-panel]')!;
+  const toggle = document.querySelector<HTMLButtonElement>('[data-toggle]')!;
+  toggle.addEventListener('click', () => {
+    const open = panel.classList.toggle('is-collapsed') === false;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Hide controls' : 'Show controls');
+    toggle.textContent = open ? '–' : '+';
+  });
+  el.heroReady!.then((h) => { hero = h; render(); });
+</script>
+
+<style>
+  .pg { position: relative; }
+  /* the stage has no background: the page shows through the hero */
+  .pg__stage {
+    position: relative;
+    min-height: calc(100vh - 4.5rem);
+    display: grid; place-items: center;
+    padding: var(--space-64) var(--space-24);
+    overflow: hidden;
+  }
+  .pg__copy { position: relative; z-index: 1; max-width: 40rem; text-align: center; display: grid; justify-items: center; gap: var(--space-24); }
+  .pg__copy h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; margin: 0; }
+  .pg__copy p { color: var(--color-text-muted, var(--color-muted)); margin: 0; }
+  .pg__ctas { display: flex; gap: var(--space-16); flex-wrap: wrap; justify-content: center; }
+
+  .panel {
+    position: fixed; z-index: 30; right: var(--space-16); top: calc(4.5rem + var(--space-16));
+    width: 18rem; max-height: calc(100vh - 4.5rem - var(--space-32));
+    display: flex; flex-direction: column;
+    background: var(--glass-bg); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 1rem);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    font-size: 0.75rem;
+  }
+  .panel__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding: var(--space-12, 0.75rem) var(--space-16); border-bottom: 1px solid var(--color-border); }
+  .panel__actions { display: flex; gap: var(--space-4, 0.25rem); }
+  .panel__btn { border: 0; border-radius: var(--radius-full); padding: 0.25rem 0.625rem; font-size: 0.6875rem; cursor: pointer; }
+  .panel__toggle { width: 1.75rem; padding: 0.25rem 0; }
+  .panel__body { overflow-y: auto; padding: var(--space-8) var(--space-16) var(--space-16); display: grid; gap: var(--space-8); }
+  .panel.is-collapsed .panel__body { display: none; }
+  .panel.is-collapsed .panel__head { border-bottom: 0; }
+  .panel__group { margin: var(--space-8) 0 0; font-size: 0.625rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+
+  .panel :global(.ctrl) { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.25rem var(--space-8); }
+  .panel :global(.ctrl__name) { opacity: .85; }
+  .panel :global(.ctrl__val) { font-variant-numeric: tabular-nums; opacity: .6; }
+  .panel :global(.ctrl input[type='range']) { grid-column: 1 / -1; width: 100%; accent-color: var(--color-blue); }
+  .panel :global(.ctrl select) { background: var(--color-surface-2); color: inherit; border: 1px solid var(--color-border); border-radius: 0.5rem; padding: 0.25rem 0.5rem; font: inherit; }
+  .panel :global(.ctrl__colors) { display: flex; gap: 0.25rem; align-items: center; }
+  .panel :global(.ctrl__colors input[type='color']) { width: 1.5rem; height: 1.5rem; padding: 0; border: 1px solid var(--color-border); border-radius: 0.375rem; background: none; cursor: pointer; }
+  .panel :global(.ctrl__mini) { width: 1.5rem; height: 1.5rem; border: 1px solid var(--color-border); border-radius: 0.375rem; background: var(--color-surface-2); color: inherit; cursor: pointer; }
+  @media (max-width: 640px) { .panel { left: var(--space-16); width: auto; top: auto; bottom: var(--space-16); max-height: 50vh; } }
+</style>

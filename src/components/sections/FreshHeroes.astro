@@ -7,6 +7,7 @@ const heroes = (await getCollection('heroes')).sort((a, b) => a.data.order - b.d
 // filter chips come from the heroes' categories, so a new category shows up automatically
 const filters = ['All', ...new Set(heroes.map((h) => h.data.category))];
 const sorts = [
+  { value: 'random', label: 'Random' },
   { value: 'popular', label: 'Popular' },
   { value: 'newest', label: 'Newest' },
   { value: 'oldest', label: 'Oldest' },
@@ -26,7 +27,7 @@ const sorts = [
       <span class="fresh__spacer"></span>
       <div class="sort">
         <button type="button" class="fresh__sort btn-raised paragraph" aria-haspopup="menu" aria-expanded="false" aria-controls="sort-menu" data-sort-toggle>
-          Sort: <span data-sort-label>Popular</span> <Icon name="chevron-down" size={16} />
+          Sort: <span data-sort-label>Random</span> <Icon name="chevron-down" size={16} />
         </button>
         <ul class="sort__menu" id="sort-menu" role="menu" aria-label="Sort heroes" hidden>
           {sorts.map((s, i) => (
@@ -184,8 +185,10 @@ const sorts = [
       toggle.setAttribute('aria-expanded', String(open));
       if (open) (items.find((i) => i.getAttribute('aria-checked') === 'true') ?? items[0]).focus();
     };
+    // Random: a fresh shuffle on every visit (and every time Random is picked again)
+    const shuffle = <T,>(list: T[]) => { for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; } return list; };
     const sortBy = (value: string) => {
-      [...cards].sort(compare[value]).forEach((card) => grid.appendChild(card));
+      (value === 'random' ? shuffle([...cards]) : [...cards].sort(compare[value])).forEach((card) => grid.appendChild(card));
       items.forEach((i) => i.setAttribute('aria-checked', String(i.dataset.sort === value)));
       label.textContent = items.find((i) => i.dataset.sort === value)?.textContent ?? '';
     };
@@ -198,7 +201,7 @@ const sorts = [
       if (e.key === 'Escape') { openMenu(false); toggle.focus(); }
     });
     document.addEventListener('click', (e) => { if (!menu.hidden && !(e.target as Element).closest('.sort')) openMenu(false); });
-    sortBy('popular');
+    sortBy('random');
 
     if (searchInput) {
       searchInput.addEventListener('input', () => { query = searchInput.value; apply(); });

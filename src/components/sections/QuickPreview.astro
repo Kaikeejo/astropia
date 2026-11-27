@@ -2,7 +2,6 @@
 import Icon from '../ui/Icon.astro';
 import Button from '../ui/Button.astro';
 import Starfield from '../ui/Starfield.astro';
-import PixelField from '../../heroes/pixel-field/PixelField.astro';
 ---
 
 <dialog class="qp" aria-labelledby="qp-title">
@@ -17,7 +16,7 @@ import PixelField from '../../heroes/pixel-field/PixelField.astro';
     </header>
     <div class="qp__body">
       <div class="qp__bg" data-qp-bg="starfield"><Starfield /></div>
-      <div class="qp__bg" data-qp-bg="pixel-field" hidden><PixelField id="qp-pf" /></div>
+      <div class="qp__bg" data-qp-live hidden></div>
       <div class="qp__copy">
         <h2 class="h2" data-qp-heading>Hero</h2>
         <p class="h5 muted">This is how your own content sits on top of the animation.</p>
@@ -50,6 +49,7 @@ import PixelField from '../../heroes/pixel-field/PixelField.astro';
   .qp__body { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-24); text-align: center; background: var(--color-bg); overflow: hidden; }
   .qp__body > :not(.qp__bg) { position: relative; }
   .qp__bg { position: absolute; inset: 0; }
+  .qp__bg :global(canvas) { display: block; width: 100%; height: 100%; }
   .qp__bg[hidden] { display: none; }
   a.qp__url { text-decoration: none; }
   a.qp__url[href]:hover { color: var(--color-text); }
@@ -58,29 +58,33 @@ import PixelField from '../../heroes/pixel-field/PixelField.astro';
 </style>
 
 <script>
-  import { DEFAULTS, type PixelFieldInstance } from '../../heroes/pixel-field/engine';
+  import { mountHero } from '../../heroes/registry';
+  import type { HeroInstance } from '../../heroes/runtime';
   const dialog = document.querySelector<HTMLDialogElement>('.qp');
   if (dialog) {
     const set = (sel: string, text: string) => dialog.querySelector(sel)!.textContent = text;
+    const live = dialog.querySelector<HTMLElement>('[data-qp-live]')!;
+    const starfield = dialog.querySelector<HTMLElement>('[data-qp-bg="starfield"]')!;
+    let hero: HeroInstance | undefined;
+    const stop = () => { hero?.destroy(); hero = undefined; live.replaceChildren(); };
     document.querySelectorAll<HTMLButtonElement>('[data-preview]').forEach((btn) => {
       btn.addEventListener('click', () => {
         set('[data-qp-title]', btn.dataset.title ?? 'Hero');
         set('[data-qp-url]', `astropia.dev/preview/${btn.dataset.preview}`);
         set('[data-qp-heading]', btn.dataset.title ?? 'Hero');
         // background: the hero's own live engine when it has one, otherwise the starfield placeholder
-        const engine = btn.dataset.engine ?? 'starfield';
-        dialog.querySelectorAll<HTMLElement>('[data-qp-bg]').forEach((bg) => { bg.hidden = bg.dataset.qpBg !== engine; });
-        if (engine === 'pixel-field') {
-          const pf = document.getElementById('qp-pf') as HTMLElement & { pixelField?: PixelFieldInstance };
-          pf.pixelField?.update({ ...DEFAULTS, ...JSON.parse(btn.dataset.settings || '{}') });
-        }
+        const engine = btn.dataset.engine;
+        stop();
+        starfield.hidden = !!engine; live.hidden = !engine;
+        dialog.showModal();
+        if (engine) mountHero(engine, live, JSON.parse(btn.dataset.settings || '{}')).then((h) => { if (dialog.open) hero = h; else h.destroy(); });
         // the URL pill opens the full hero page when there is one
         const link = dialog.querySelector<HTMLAnchorElement>('[data-qp-link]')!;
         if (btn.dataset.engine) link.href = `/heroes/${btn.dataset.preview}`; else link.removeAttribute('href');
-        dialog.showModal();
       });
     });
     dialog.querySelector('[data-qp-close]')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', stop); // stop the animation when the popup closes
     // click on the dimmed backdrop closes too
     dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
   }
