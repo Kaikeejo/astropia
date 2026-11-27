@@ -1,10 +1,10 @@
 [
-  {"id": "helical-solar-system", "title": "Helical Solar System", "author": "Astropia", "category": "Space", "price": "Free", "pattern": "grid", "likes": 128, "isNew": true, "order": 1},
-  {"id": "particle-galaxy", "title": "Particle Galaxy", "author": "Mira Sol", "category": "Particles", "price": "Free", "pattern": "rays", "likes": 72, "isNew": true, "order": 2},
-  {"id": "warp-starfield", "title": "Warp Starfield", "author": "Orion Studio", "category": "Canvas", "price": "Free", "pattern": "wavy", "likes": 64, "order": 3},
-  {"id": "nebula-clouds", "title": "Nebula Clouds", "author": "Lumen Lab", "category": "Shaders", "price": "Pro", "pattern": "squares", "likes": 51, "order": 4},
-  {"id": "orbit-rings", "title": "Orbit Rings", "author": "Astropia", "category": "3D", "price": "Free", "pattern": "dots", "likes": 47, "order": 5},
-  {"id": "aurora-waves", "title": "Aurora Waves", "author": "Nova Kade", "category": "Shaders", "price": "Pro", "pattern": "angled", "likes": 39, "order": 6},
-  {"id": "constellation-network", "title": "Constellation Network", "author": "Orion Studio", "category": "Particles", "price": "Free", "pattern": "horizon", "likes": 33, "order": 7},
-  {"id": "black-hole", "title": "Black Hole", "author": "Mira Sol", "category": "3D", "price": "Free", "pattern": "circles", "likes": 28, "order": 8}
+  {"id": "helical-solar-system", "title": "Helical Solar System", "author": "Astropia", "category": "Space", "price": "Free", "pattern": "grid", "likes": 128, "isNew": true, "added": "2026-11-20", "order": 1},
+  {"id": "particle-galaxy", "title": "Particle Galaxy", "author": "Mira Sol", "category": "Particles", "price": "Free", "pattern": "rays", "likes": 72, "isNew": true, "added": "2026-11-18", "order": 2},
+  {"id": "warp-starfield", "title": "Warp Starfield", "author": "Orion Studio", "category": "Canvas", "price": "Free", "pattern": "wavy", "likes": 64, "added": "2026-10-30", "order": 3},
+  {"id": "nebula-clouds", "title": "Nebula Clouds", "author": "Lumen Lab", "category": "Shaders", "price": "Pro", "pattern": "squares", "likes": 51, "added": "2026-10-12", "order": 4},
+  {"id": "orbit-rings", "title": "Orbit Rings", "author": "Astropia", "category": "3D", "price": "Free", "pattern": "dots", "likes": 47, "added": "2026-09-28", "order": 5},
+  {"id": "aurora-waves", "title": "Aurora Waves", "author": "Nova Kade", "category": "Shaders", "price": "Pro", "pattern": "angled", "likes": 39, "added": "2026-09-05", "order": 6},
+  {"id": "constellation-network", "title": "Constellation Network", "author": "Orion Studio", "category": "Particles", "price": "Free", "pattern": "horizon", "likes": 33, "added": "2026-08-21", "order": 7},
+  {"id": "black-hole", "title": "Black Hole", "author": "Mira Sol", "category": "3D", "price": "Free", "pattern": "circles", "likes": 28, "added": "2026-08-02", "order": 8}
 ]

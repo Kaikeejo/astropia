@@ -12,6 +12,7 @@ const heroes = defineCollection({
     category: z.string(),
     price: z.enum(['Free', 'Pro']),
     isNew: z.boolean().default(false), // shows a NEW tag on the card
+    added: z.string(), // date added (YYYY-MM-DD), used by the Newest / Oldest sort
     pattern,
     likes: z.number(),
     order: z.number(),

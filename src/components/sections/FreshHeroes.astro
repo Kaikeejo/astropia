@@ -5,6 +5,14 @@ import Icon from '../ui/Icon.astro';
 import HeroCard from '../cards/HeroCard.astro';
 const heroes = (await getCollection('heroes')).sort((a, b) => a.data.order - b.data.order);
 const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro animation'];
+const sorts = [
+  { value: 'popular', label: 'Popular' },
+  { value: 'newest', label: 'Newest' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'az', label: 'A–Z' },
+  { value: 'za', label: 'Z–A' },
+  { value: 'author', label: 'Author' },
+];
 ---
 
 <section class="section fresh" id="heroes">
@@ -15,7 +23,18 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
         {filters.map((f, i) => <Chip value={f} active={i === 0}>{f}</Chip>)}
       </div>
       <span class="fresh__spacer"></span>
-      <button type="button" class="fresh__sort btn-raised paragraph">Sort: Popular <Icon name="chevron-down" size={16} /></button>
+      <div class="sort">
+        <button type="button" class="fresh__sort btn-raised paragraph" aria-haspopup="menu" aria-expanded="false" aria-controls="sort-menu" data-sort-toggle>
+          Sort: <span data-sort-label>Popular</span> <Icon name="chevron-down" size={16} />
+        </button>
+        <ul class="sort__menu" id="sort-menu" role="menu" aria-label="Sort heroes" hidden>
+          {sorts.map((s, i) => (
+            <li role="none">
+              <button type="button" role="menuitemradio" class="sort__item paragraph" data-sort={s.value} aria-checked={i === 0 ? 'true' : 'false'}>{s.label}</button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
     <div class="fresh__grid">
       {heroes.map((hero) => <HeroCard hero={hero} />)}
@@ -66,7 +85,30 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
   }
   .segmented.no-anim .segmented__thumb { transition: none; }
   .fresh__sort { padding: var(--space-8) var(--space-16); }
-  .fresh__sort :global(svg) { color: var(--color-text); }
+  .fresh__sort :global(svg) { color: var(--color-text); transition: rotate var(--dur) var(--ease); }
+  .fresh__sort[aria-expanded='true'] :global(svg) { rotate: 180deg; }
+  /* sort dropdown: same raised grey language as the buttons */
+  .sort { position: relative; }
+  .sort__menu {
+    position: absolute; right: 0; top: calc(100% + var(--space-8)); z-index: 10;
+    min-width: 11rem;
+    margin: 0; padding: 4px; list-style: none;
+    display: flex; flex-direction: column; gap: 2px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+  .sort__menu[hidden] { display: none; }
+  .sort__item {
+    width: 100%; text-align: left;
+    padding: var(--space-8) var(--space-16);
+    border: 0; border-radius: var(--radius-sm);
+    background: none; color: var(--color-text-muted);
+    cursor: pointer; white-space: nowrap;
+    transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+  .sort__item:hover, .sort__item:focus-visible { color: var(--color-text); background: var(--color-surface-2); outline: none; }
+  .sort__item[aria-checked='true'] { color: var(--color-text); background: var(--raised-bg); box-shadow: var(--raised-shadow); }
   .fresh__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); }
   .fresh__all { display: inline-flex; align-items: center; gap: var(--space-8); align-self: flex-end; }
   .fresh__all :global(svg) { transition: translate var(--dur) var(--ease); }
@@ -76,11 +118,11 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
 </style>
 
 <script>
-  // Filter chips: show only cards in the chosen category.
+  // Filter chips + hero search: show only cards that match both.
   const section = document.querySelector<HTMLElement>('.fresh');
   if (section) {
     const chips = section.querySelectorAll<HTMLButtonElement>('[data-filter]');
-    const cards = section.querySelectorAll<HTMLElement>('[data-category]');
+    const cards = section.querySelectorAll<HTMLElement>('.hero-card'); // (not [data-category]: the preview buttons carry that too)
     const empty = section.querySelector<HTMLElement>('.fresh__empty')!;
     const bar = section.querySelector<HTMLElement>('.segmented')!;
     const moveThumb = (chip: HTMLElement) => {
@@ -95,17 +137,78 @@ const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro 
     requestAnimationFrame(() => requestAnimationFrame(() => bar.classList.remove('no-anim')));
     addEventListener('resize', () => moveThumb(active()));
 
-    chips.forEach((chip) => chip.addEventListener('click', () => {
-      const f = chip.dataset.filter;
-      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-      moveThumb(chip);
+    // Filtering = category chip AND the hero search text (title, author or category)
+    let filter = 'All', query = '';
+    const searchInput = document.querySelector<HTMLInputElement>('[data-hero-search]');
+    const apply = () => {
+      const words = query.toLowerCase().split(/\s+/).filter(Boolean);
       let shown = 0;
       cards.forEach((card) => {
-        const match = f === 'All' || card.dataset.category === f;
+        const inCategory = filter === 'All' || card.dataset.category === filter;
+        const text = card.dataset.search ?? '';
+        const match = inCategory && words.every((w) => text.includes(w));
         card.hidden = !match;
         if (match) shown++;
       });
+      empty.textContent = query.trim()
+        ? `No heroes match "${query.trim()}"${filter === 'All' ? '' : ` in ${filter}`}.`
+        : 'No heroes in this category yet.';
       empty.hidden = shown > 0;
+    };
+
+    chips.forEach((chip) => chip.addEventListener('click', () => {
+      filter = chip.dataset.filter ?? 'All';
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      moveThumb(chip);
+      apply();
     }));
+
+    // Sort dropdown: reorders the cards in the grid (works together with filters + search)
+    const grid = section.querySelector<HTMLElement>('.fresh__grid')!;
+    const toggle = section.querySelector<HTMLButtonElement>('[data-sort-toggle]')!;
+    const menu = section.querySelector<HTMLElement>('.sort__menu')!;
+    const label = section.querySelector<HTMLElement>('[data-sort-label]')!;
+    const items = [...menu.querySelectorAll<HTMLButtonElement>('[data-sort]')];
+    const byText = (k: 'title' | 'author') => (a: HTMLElement, b: HTMLElement) => (a.dataset[k] ?? '').localeCompare(b.dataset[k] ?? '');
+    const compare: Record<string, (a: HTMLElement, b: HTMLElement) => number> = {
+      popular: (a, b) => Number(b.dataset.likes) - Number(a.dataset.likes),
+      newest: (a, b) => (b.dataset.added ?? '').localeCompare(a.dataset.added ?? ''),
+      oldest: (a, b) => (a.dataset.added ?? '').localeCompare(b.dataset.added ?? ''),
+      az: byText('title'),
+      za: (a, b) => byText('title')(b, a),
+      author: (a, b) => byText('author')(a, b) || byText('title')(a, b),
+    };
+    const openMenu = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) (items.find((i) => i.getAttribute('aria-checked') === 'true') ?? items[0]).focus();
+    };
+    const sortBy = (value: string) => {
+      [...cards].sort(compare[value]).forEach((card) => grid.appendChild(card));
+      items.forEach((i) => i.setAttribute('aria-checked', String(i.dataset.sort === value)));
+      label.textContent = items.find((i) => i.dataset.sort === value)?.textContent ?? '';
+    };
+    toggle.addEventListener('click', () => openMenu(menu.hidden === true));
+    items.forEach((item) => item.addEventListener('click', () => { sortBy(item.dataset.sort!); openMenu(false); toggle.focus(); }));
+    menu.addEventListener('keydown', (e) => {
+      const i = items.indexOf(document.activeElement as HTMLButtonElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      if (e.key === 'Escape') { openMenu(false); toggle.focus(); }
+    });
+    document.addEventListener('click', (e) => { if (!menu.hidden && !(e.target as Element).closest('.sort')) openMenu(false); });
+    sortBy('popular');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => { query = searchInput.value; apply(); });
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        if (e.key === 'Escape') { searchInput.value = ''; query = ''; apply(); }
+      });
+      // the nav search button and Cmd/Ctrl+K jump to the hero search
+      const focusSearch = () => { scrollTo({ top: 0, behavior: 'smooth' }); searchInput.focus({ preventScroll: true }); };
+      document.querySelector('.navbar__search')?.addEventListener('click', focusSearch);
+      addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); focusSearch(); } });
+    }
   }
 </script>

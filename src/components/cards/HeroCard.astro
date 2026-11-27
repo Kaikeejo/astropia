@@ -5,13 +5,15 @@ import Icon from '../ui/Icon.astro';
 
 interface Props { hero: CollectionEntry<'heroes'> }
 const { hero } = Astro.props;
-const { title, author, category, isNew, pattern } = hero.data;
+const { title, author, category, isNew, pattern, likes, added } = hero.data;
 ---
 
-<article class="hero-card" data-category={category}>
+<article class="hero-card" data-category={category} data-search={`${title} ${author} ${category}`.toLowerCase()}
+  data-title={title} data-author={author} data-likes={likes} data-added={added}>
   <div class="hero-card__thumb">
     <Pattern name={pattern} blank /> {/* artwork hidden for now: remove `blank` to bring it back */}
     <div class="hero-card__scrim"></div>
+    {isNew && <span class="tag blue hero-card__new">New</span>}
     <div class="hero-card__actions">
       <button type="button" class="icon-btn" aria-label={`Quick preview ${title}`} data-preview={hero.id} data-title={title} data-category={category}>
         <Icon name="eye" size={16} />
@@ -24,7 +26,6 @@ const { title, author, category, isNew, pattern } = hero.data;
   <div class="hero-card__body">
     <div class="hero-card__title-row">
       <h3 class="h6 hero-card__title">{title}</h3>
-      {isNew && <span class="tag blue">New</span>}
     </div>
     <p class="hero-card__meta paragraph muted">
       <span class="avatar" aria-hidden="true"></span>
@@ -50,6 +51,8 @@ const { title, author, category, isNew, pattern } = hero.data;
   .hero-card__thumb { position: relative; height: 176px; border-radius: 12px; overflow: hidden; }
   .hero-card:hover :global(.pattern__canvas) { scale: 1.06; }
 
+  /* NEW tag sits on the thumbnail, top left */
+  .hero-card__new { position: absolute; top: var(--space-16); left: var(--space-16); z-index: 1; }
   .hero-card__scrim {
     position: absolute;
     inset: 0;
