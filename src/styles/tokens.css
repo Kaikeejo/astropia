@@ -20,7 +20,7 @@
      (buttons, borders, links, pixel thumbnails, live heroes), so changing one changes all of them.
      The colour pickers in the hero grid's filter bar set them live. */
   --brand-blue: #4c8dff;
-  --brand-pink: #d92875;
+  --brand-pink: #2db8a4; /* colour 2 (teal) - name kept from when it was pink */
   --color-blue: var(--brand-blue);
   --color-blue-strong: color-mix(in oklch, var(--brand-blue), black 18%);
   --color-pink: var(--brand-pink);

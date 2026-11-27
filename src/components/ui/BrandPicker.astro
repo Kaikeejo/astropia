@@ -2,7 +2,7 @@
 // Two spot-colour pickers (blue + pink) in the nav. They set --brand-blue / --brand-pink on the
 // page, so every blue and pink (buttons, borders, thumbnails, live heroes) follows. Saved in this browser.
 // Our own small picker (hex only): colour area + hue bar + hex field + presets, styled like the site.
-const PRESETS = ['#4C8DFF', '#D92875', '#22D3EE', '#14B8A6', '#22C55E', '#A3E635', '#FACC15', '#F97316', '#EF4444', '#FB7185'];
+const PRESETS = ['#4C8DFF', '#2DB8A4', '#22D3EE', '#D92875', '#22C55E', '#A3E635', '#FACC15', '#F97316', '#EF4444', '#FB7185'];
 ---
 
 <div class="brand-picker" data-brand-picker>
@@ -125,7 +125,7 @@ const PRESETS = ['#4C8DFF', '#D92875', '#22D3EE', '#14B8A6', '#22C55E', '#A3E635
 
 <script>
   const root = document.documentElement;
-  const DEFAULT: Record<'blue' | 'pink', string> = { blue: '#4c8dff', pink: '#d92875' };
+  const DEFAULT: Record<'blue' | 'pink', string> = { blue: '#4c8dff', pink: '#2db8a4' };
   type Key = 'blue' | 'pink';
 
   // ---- colour maths (hex <-> hue/saturation/value) ----
