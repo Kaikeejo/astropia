@@ -1,6 +1,5 @@
 ---
 import PixelIcon from '../ui/PixelIcon.astro';
-import PixelField from '../ui/PixelField.astro';
 const columns = [
   { title: 'Product', links: ['Heroes', 'Categories', 'Authors', 'Pricing'] },
   { title: 'Resources', links: ['Docs', 'Astro guide', 'Changelog', 'Licenses'] },
@@ -9,7 +8,6 @@ const columns = [
 ---
 
 <footer class="footer">
-  <PixelField />
   <div class="container footer__inner">
     <div class="footer__columns">
       <div class="footer__brand">
@@ -34,8 +32,7 @@ const columns = [
 </footer>
 
 <style>
-  .footer { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-64) var(--gutter); border-top: 1px solid var(--color-border); }
-  .footer :global(.pixel-field) { z-index: -1; }
+  .footer { padding: var(--space-64) var(--gutter); border-top: 1px solid var(--color-border); background: #06070b; } /* slightly darker than the page bg (#090b11) */
   .footer__inner { display: flex; flex-direction: column; gap: var(--space-48); }
   .footer__columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-24); }
   .footer__brand { display: flex; flex-direction: column; gap: var(--space-16); }
