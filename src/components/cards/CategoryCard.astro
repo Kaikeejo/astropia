@@ -8,7 +8,7 @@ const { name, count, pattern } = Astro.props.category.data;
 ---
 
 <a class="category-card" href={`#${Astro.props.category.id}`}>
-  <div class="category-card__thumb"><Pattern name={pattern} /></div>
+  <div class="category-card__thumb"><Pattern name={pattern} blank /></div>
   <div class="category-card__body">
     <div class="category-card__text">
       <h3 class="h6">{name}</h3>

@@ -15,6 +15,8 @@ const cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
 // the "core" is the part a small card thumbnail shows (≈ the Figma 320x200 thumbnail)
 const CORE_W = 53, CORE_H = 33;
 const BLUE = '#4C8DFF', PINK = '#D92875';
+// single-colour designs (match the Featured card accents: Particle Galaxy = blue, Solar System = pink)
+const SOLO: Record<string, string> = { galaxy: BLUE, helix: PINK };
 
 type Put = (c: number, r: number, o: number) => void;
 type Rnd = () => number;
@@ -193,7 +195,8 @@ export function pixelPattern(name: PatternName): PixelLayer[] {
   const spanStart = isBoxed ? c0 : cx - CORE_W / 2, span = isBoxed ? bw : CORE_W;
   for (const [k, o] of cells) {
     const [c, r] = k.split(',').map(Number);
-    const fill = ((c - spanStart) / span * .75 + colorNoise(c, r) * .5 + (rnd() - .5) * .3) > .62 ? PINK : BLUE;
+    const mixed = ((c - spanStart) / span * .75 + colorNoise(c, r) * .5 + (rnd() - .5) * .3) > .62 ? PINK : BLUE;
+    const fill = SOLO[name] ?? mixed;
     const lvl = Math.min(LEVELS - 1, Math.floor(o * LEVELS));
     const g = fill + '|' + lvl;
     groups.set(g, (groups.get(g) ?? '') + `M${OX + c * STEP} ${OY + r * STEP}h${CELL}v${CELL}h-${CELL}z`);

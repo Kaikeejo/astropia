@@ -11,15 +11,17 @@ interface Props {
   name: PatternName;
   /** add the thumbnail-sized vignette (used on smaller cards) */
   vignette?: boolean;
+  /** show the empty thumbnail frame only, no artwork */
+  blank?: boolean;
 }
-const { name, vignette = true } = Astro.props;
+const { name, vignette = true, blank = false } = Astro.props;
 ---
 
 {STYLE === 'lines' ? <PatternLines name={name} vignette={vignette} /> : (
   <div class="pattern" aria-hidden="true">
     <div class="pattern__canvas">
       <!-- static SVG built by src/pages/patterns/[name].svg.ts -->
-      <img src={`/patterns/${name}.svg`} width={W} height={H} alt="" loading="lazy" decoding="async" />
+      {!blank && <img src={`/patterns/${name}.svg`} width={W} height={H} alt="" loading="lazy" decoding="async" />}
     </div>
     {vignette && <div class="pattern__vignette"></div>}
   </div>

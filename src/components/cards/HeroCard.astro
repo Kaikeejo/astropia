@@ -10,7 +10,7 @@ const { title, author, category, isNew, pattern } = hero.data;
 
 <article class="hero-card" data-category={category}>
   <div class="hero-card__thumb">
-    <Pattern name={pattern} />
+    <Pattern name={pattern} blank /> {/* artwork hidden for now: remove `blank` to bring it back */}
     <div class="hero-card__scrim"></div>
     <div class="hero-card__actions">
       <button type="button" class="icon-btn" aria-label={`Quick preview ${title}`} data-preview={hero.id} data-title={title} data-category={category}>
