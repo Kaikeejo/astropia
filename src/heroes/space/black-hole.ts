@@ -1,6 +1,6 @@
 // Black hole: a disk of particles spiralling into a dark centre with a glowing ring,
 // plus a wormhole tunnel.
-import { createEngine, rgba, mix, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
+import { createEngine, glowSprite, rgba, mix, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
 
 export interface BlackHoleSettings {
   seed: number; colors: string[];
@@ -107,23 +107,25 @@ export const mount = createEngine<BlackHoleSettings, State>({
       return;
     }
 
-    // wormhole
-    // rings of light falling into the tunnel, twisting as they go
-    const rings = 26, per = Math.max(24, Math.round(S.count / rings));
+    // wormhole: soft glowing dust (like Vortex) swirling down into the tunnel
     glowDisc(rh * 3, c1, 0.35 * S.ringGlow);
-    for (let i = 0; i < rings; i++) {
-      const u = (((i / rings) - t * S.infall * 0.08) % 1 + 1) % 1; // 0 = deep inside, 1 = outer edge
-      const r = rh + (R * 1.2 - rh) * u * u;
-      const twist = (1 - u) * 4 * S.spin + t * S.spin * 0.4;
-      const rgb = mix(c1, c0, u);
-      const a = S.opacity * Math.min(1, u * 4) * (1 - u * 0.75);
-      for (let j = 0; j < per; j++) {
-        const ang = (j / per) * Math.PI * 2 + twist + (i % 2) * 0.2;
-        const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r * Math.max(0.35, S.tilt * 2.2);
-        const s = ps * (0.5 + u * 1.4);
-        ctx.fillStyle = rgba(j % 7 === 0 ? WHITE : rgb, a); ctx.fillRect(x - s / 2, y - s / 2, s, s);
-      }
+    const sprites = [c0, c1].map((c) => glowSprite(c)), whiteSprite = glowSprite(WHITE, 0.3);
+    const base = ps * 3.2;
+    for (const p of st.ps) {
+      const u = ((p.u - t * S.infall * 0.08) % 1 + 1) % 1; // 0 = deep inside, 1 = outer edge
+      const r = (rh + (R * 1.2 - rh) * u * u) * (0.92 + p.v * 0.16);
+      const ang = p.a + (1 - u) * 4 * S.spin + t * S.spin * 0.4;
+      const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r * Math.max(0.35, S.tilt * 2.2);
+      const a = S.opacity * Math.min(1, u * 4) * (1 - u * 0.7) * (0.45 + p.v * 0.55);
+      if (a < 0.01) continue;
+      const white = p.v > 0.93, puff = p.v < 0.08;
+      // colour 2 near the centre, colour 1 further out (mixed a little for a softer blend)
+      const sprite = white ? whiteSprite : sprites[u + (p.r - 0.5) * 0.35 < 0.45 ? 1 : 0];
+      const size = base * (0.45 + u * 1.3) * (puff ? 6 : white ? 0.6 : 0.6 + p.r * 0.8);
+      ctx.globalAlpha = Math.min(1, puff ? a * 0.18 : a);
+      ctx.drawImage(sprite, x - size / 2, y - size / 2, size, size);
     }
+    ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'destination-out';
     const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rh * 1.3);
     g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
