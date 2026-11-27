@@ -1,13 +1,17 @@
-// Path data for the 8 thumbnail patterns. Same geometry as the Figma "Thumbnail Pattern" component:
+// BACKUP: original line thumbnails (used by PatternLines.astro). Path data for the 8 thumbnail patterns. Same geometry as the Figma "Thumbnail Pattern" component:
 // a 640x400 canvas, centered and cropped (never stretched) inside each thumbnail.
-export type PatternName = 'grid' | 'angled' | 'wavy' | 'circles' | 'dots' | 'rays' | 'squares' | 'horizon';
+export type LinePatternName = 'grid' | 'angled' | 'wavy' | 'circles' | 'dots' | 'rays' | 'squares' | 'horizon';
+// the 5 newer designs only exist as pixel thumbnails; in the line backup they borrow the closest line pattern
+export type PatternName = LinePatternName | 'galaxy' |'helix' |'constellation' |'streaks' |'skyline';
+const LINE_FALLBACK: Record<string, LinePatternName> = { galaxy: 'rays', helix: 'circles', constellation: 'dots', streaks: 'angled', skyline: 'horizon' };
 
 export const W = 640;
 export const H = 400;
 const cx = W / 2;
 const cy = H / 2;
 
-export function patternPath(name: PatternName): { d: string; filled?: boolean } {
+export function patternPath(pattern: PatternName): { d: string; filled?: boolean } {
+  const name: LinePatternName = (LINE_FALLBACK[pattern] ?? pattern) as LinePatternName;
   let d = '';
   switch (name) {
     case 'grid':

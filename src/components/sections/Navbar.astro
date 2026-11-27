@@ -1,7 +1,6 @@
 ---
 import PixelIcon from '../ui/PixelIcon.astro';
 import Icon from '../ui/Icon.astro';
-import Button from '../ui/Button.astro';
 const links = ['Explore', 'Heroes', 'Categories'];
 ---
 
@@ -15,7 +14,6 @@ const links = ['Explore', 'Heroes', 'Categories'];
   <button type="button" class="navbar__search paragraph muted">
     <Icon name="search" size={16} /><span class="navbar__search-label">Search</span><kbd class="accent">⌘K</kbd>
   </button>
-  <Button type="primary" size="small" href="#">Get started</Button>
   </div>
   </div>
 </header>
@@ -37,7 +35,7 @@ const links = ['Explore', 'Heroes', 'Categories'];
   .navbar__search {
     display: flex; align-items: center; gap: var(--space-8);
     height: 2.5rem; /* same height as the small buttons */
-    min-width: 12.5rem;
+    min-width: 16rem; /* a bit wider now Get started is gone */
     padding: calc(var(--space-8) - 1px) calc(var(--space-16) - 1px);
     border-radius: var(--radius-full); border: 1px solid var(--color-border); background: var(--color-surface);
     cursor: pointer; transition: border-color var(--dur) var(--ease);

@@ -1,0 +1,68 @@
+---
+import { patternPath, W, H, type PatternName } from '../../lib/patterns';
+
+interface Props {
+  name: PatternName;
+  /** add the thumbnail-sized vignette (used on smaller cards) */
+  vignette?: boolean;
+}
+const { name, vignette = true } = Astro.props;
+const { d, filled } = patternPath(name);
+---
+
+<div class="pattern" aria-hidden="true">
+  <div class="pattern__canvas">
+    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none">
+      {filled ? <path d={d} fill="var(--color-border)" /> : <path d={d} stroke="var(--color-border)" stroke-width="1" />}
+    </svg>
+    <div class="pattern__fade"></div>
+  </div>
+  {vignette && <div class="pattern__vignette"></div>}
+</div>
+
+<style>
+  /* thumbnail bg (RGB numbers): defaults to --color-well #0a0b10; the vignette fades to the same colour */
+  .pattern {
+    --pattern-bg: var(--pattern-bg-override, 10 11 16);
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: inherit;
+    background: rgb(var(--pattern-bg));
+  }
+  /* the 640x400 canvas is centered and cropped, never stretched */
+  .pattern__canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 640px;
+    height: 400px;
+    translate: -50% -50%;
+    transition: scale 600ms var(--ease);
+  }
+  /* pattern strength: lower = subtler thumbnails */
+  .pattern__canvas svg { opacity: 1; }
+  .pattern__fade {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      rgb(var(--pattern-bg) / 0) 0%,
+      rgb(var(--pattern-bg) / 0.35) 55%,
+      rgb(var(--pattern-bg) / 0.95) 100%
+    );
+  }
+  /* vignette sized to the thumbnail: lines fade out toward every edge */
+  .pattern__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 60% 60% at 50% 50%,
+      rgb(var(--pattern-bg) / 0) 0%,
+      rgb(var(--pattern-bg) / 0.1) 30%,
+      rgb(var(--pattern-bg) / 0.75) 70%,
+      rgb(var(--pattern-bg) / 1) 100%
+    );
+  }
+</style>

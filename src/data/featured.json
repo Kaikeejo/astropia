@@ -1,4 +1,4 @@
 [
-  {"id": "particle-galaxy", "accent": "blue", "name": "Particle Galaxy", "badge": "New", "headline": "A living galaxy, built from particles.", "description": "Thousands of glowing particles spiral into a galaxy you can tilt and tune. Free for any Astro project.", "file": "ParticleGalaxy.astro", "pattern": "wavy", "order": 1},
-  {"id": "helical-solar-system", "accent": "pink", "name": "Solar System", "badge": "New", "headline": "The solar system, in motion.", "description": "Planets corkscrew through space with a face-on intro. Copy it into Astro in seconds.", "file": "SolarHero.astro", "pattern": "circles", "order": 2}
+  {"id": "particle-galaxy", "accent": "blue", "name": "Particle Galaxy", "badge": "New", "headline": "A living galaxy, built from particles.", "description": "Thousands of glowing particles spiral into a galaxy you can tilt and tune. Free for any Astro project.", "file": "ParticleGalaxy.astro", "pattern": "galaxy", "order": 1},
+  {"id": "helical-solar-system", "accent": "pink", "name": "Solar System", "badge": "New", "headline": "The solar system, in motion.", "description": "Planets corkscrew through space with a face-on intro. Copy it into Astro in seconds.", "file": "SolarHero.astro", "pattern": "helix", "order": 2}
 ]

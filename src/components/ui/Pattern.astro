@@ -1,5 +1,11 @@
 ---
-import { patternPath, W, H, type PatternName } from '../../lib/patterns';
+// Card thumbnails. STYLE switches between the new pixel thumbnails and the original
+// line thumbnails (kept as a backup in PatternLines.astro + lib/patterns.ts).
+import { W, H } from '../../lib/pixelPatterns';
+import type { PatternName } from '../../lib/patterns';
+import PatternLines from './PatternLines.astro';
+
+const STYLE = 'pixels' as 'pixels' | 'lines'; // set to 'lines' to bring back the old thumbnails
 
 interface Props {
   name: PatternName;
@@ -7,21 +13,20 @@ interface Props {
   vignette?: boolean;
 }
 const { name, vignette = true } = Astro.props;
-const { d, filled } = patternPath(name);
 ---
 
-<div class="pattern" aria-hidden="true">
-  <div class="pattern__canvas">
-    <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} fill="none">
-      {filled ? <path d={d} fill="var(--color-border)" /> : <path d={d} stroke="var(--color-border)" stroke-width="1" />}
-    </svg>
-    <div class="pattern__fade"></div>
+{STYLE === 'lines' ? <PatternLines name={name} vignette={vignette} /> : (
+  <div class="pattern" aria-hidden="true">
+    <div class="pattern__canvas">
+      <!-- static SVG built by src/pages/patterns/[name].svg.ts -->
+      <img src={`/patterns/${name}.svg`} width={W} height={H} alt="" loading="lazy" decoding="async" />
+    </div>
+    {vignette && <div class="pattern__vignette"></div>}
   </div>
-  {vignette && <div class="pattern__vignette"></div>}
-</div>
+)}
 
 <style>
-  /* thumbnail bg (RGB numbers): defaults to --color-well #0a0b10; the vignette fades to the same colour */
+  /* same frame, crop and vignette as the line thumbnails, so every card layout keeps working */
   .pattern {
     --pattern-bg: var(--pattern-bg-override, 10 11 16);
     position: absolute;
@@ -31,7 +36,7 @@ const { d, filled } = patternPath(name);
     border-radius: inherit;
     background: rgb(var(--pattern-bg));
   }
-  /* the 640x400 canvas is centered and cropped, never stretched */
+  /* the 640x400 canvas is centered and cropped, never stretched (pixels stay 4px) */
   .pattern__canvas {
     position: absolute;
     left: 50%;
@@ -41,27 +46,15 @@ const { d, filled } = patternPath(name);
     translate: -50% -50%;
     transition: scale 600ms var(--ease);
   }
-  /* pattern strength: lower = subtler thumbnails */
-  .pattern__canvas svg { opacity: 1; }
-  .pattern__fade {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
-      rgb(var(--pattern-bg) / 0) 0%,
-      rgb(var(--pattern-bg) / 0.35) 55%,
-      rgb(var(--pattern-bg) / 0.95) 100%
-    );
-  }
-  /* vignette sized to the thumbnail: lines fade out toward every edge */
+  .pattern__canvas img { display: block; }
   .pattern__vignette {
     position: absolute;
     inset: 0;
     background: radial-gradient(
       ellipse 60% 60% at 50% 50%,
       rgb(var(--pattern-bg) / 0) 0%,
-      rgb(var(--pattern-bg) / 0.1) 30%,
-      rgb(var(--pattern-bg) / 0.75) 70%,
+      rgb(var(--pattern-bg) / 0.15) 35%,
+      rgb(var(--pattern-bg) / 0.7) 70%,
       rgb(var(--pattern-bg) / 1) 100%
     );
   }

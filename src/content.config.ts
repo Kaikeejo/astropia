@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { file } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-const pattern = z.enum(['grid', 'angled', 'wavy', 'circles', 'dots', 'rays', 'squares', 'horizon']);
+const pattern = z.enum(['grid', 'angled', 'wavy', 'circles', 'dots', 'rays', 'squares', 'horizon', 'galaxy', 'helix', 'constellation', 'streaks', 'skyline']);
 
 const heroes = defineCollection({
   loader: file('src/data/heroes.json'),
