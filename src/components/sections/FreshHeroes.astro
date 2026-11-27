@@ -118,7 +118,7 @@ const sorts = [
   }
   .sort__item:hover, .sort__item:focus-visible { color: var(--color-text); background: var(--color-surface-2); outline: none; }
   .sort__item[aria-checked='true'] { color: var(--color-text); background: var(--raised-bg); box-shadow: var(--raised-shadow); }
-  .fresh__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); }
+  .fresh__grid { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); }
   /* page changes scroll back to the filter bar, clear of the sticky nav */
   .fresh__filters { scroll-margin-top: 96px; }
   /* pagination (left) + "Showing x to y of z heroes" (right) */
@@ -171,6 +171,47 @@ const sorts = [
     const PER_PAGE = 24;
     let page = 1;
     const grid = section.querySelector<HTMLElement>('.fresh__grid')!;
+
+    // Isotope-style animation ("FLIP"): measure where every card is, make the change, measure again,
+    // then animate each card from its old spot to its new one. Cards that leave shrink and fade out
+    // where they were; cards that arrive grow and fade in. Reduced motion: no animation.
+    const EASE = 'cubic-bezier(0.3, 1.15, 0.5, 1)', MOVE_MS = 520, FADE_MS = 320;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const leaving = new Set<HTMLElement>();
+    const flip = (change: () => void) => {
+      if (reduceMotion.matches) { change(); return; }
+      // finish anything still leaving from the last change
+      leaving.forEach((c) => { c.getAnimations().forEach((a) => a.cancel()); c.removeAttribute('style'); c.hidden = true; });
+      leaving.clear();
+      const g0 = grid.getBoundingClientRect();
+      const before = new Map<HTMLElement, DOMRect>();
+      cards.forEach((c) => { if (!c.hidden) before.set(c, c.getBoundingClientRect()); }); // includes any move in progress
+      cards.forEach((c) => c.getAnimations().forEach((a) => a.cancel()));
+      change();
+      const g1 = grid.getBoundingClientRect();
+      cards.forEach((c) => {
+        const old = before.get(c);
+        if (!c.hidden) {
+          if (old) {
+            // stayed: slide from the old spot
+            const r = c.getBoundingClientRect();
+            const dx = (old.left - g0.left) - (r.left - g1.left), dy = (old.top - g0.top) - (r.top - g1.top);
+            if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5)
+              c.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: MOVE_MS, easing: EASE });
+          } else {
+            // arrived: grow in
+            c.animate([{ opacity: 0, transform: 'scale(0.85)' }, { opacity: 1, transform: 'none' }], { duration: MOVE_MS, easing: EASE, delay: 60 , fill: 'backwards' });
+          }
+        } else if (old) {
+          // left: keep it where it was (out of the layout) while it shrinks away
+          leaving.add(c);
+          c.hidden = false;
+          Object.assign(c.style, { position: 'absolute', left: `${old.left - g0.left}px`, top: `${old.top - g0.top}px`, width: `${old.width}px`, height: `${old.height}px`, pointerEvents: 'none', zIndex: '0' });
+          c.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(0.85)' }], { duration: FADE_MS, easing: 'ease-in', fill: 'forwards' })
+            .finished.then(() => { if (!leaving.has(c)) return; leaving.delete(c); c.removeAttribute('style'); c.hidden = true; c.getAnimations().forEach((a) => a.cancel()); }).catch(() => {});
+        }
+      });
+    };
     const pagerBar = section.querySelector<HTMLElement>('[data-pager-bar]')!;
     const pager = section.querySelector<HTMLElement>('[data-pager]')!;
     const pageList = section.querySelector<HTMLElement>('[data-page-list]')!;
@@ -210,7 +251,7 @@ const sorts = [
       }));
     };
     const goTo = (p: number) => {
-      page = p; paginate();
+      flip(() => { page = p; paginate(); });
       // bring the top of the grid back into view
       section.querySelector('.fresh__filters')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
@@ -242,7 +283,7 @@ const sorts = [
       filter = chip.dataset.filter ?? 'All';
       chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
       moveThumb(chip);
-      apply();
+      flip(apply);
     }));
 
     // Sort dropdown: reorders the cards in the grid (works together with filters + search)
@@ -273,7 +314,7 @@ const sorts = [
       label.textContent = items.find((i) => i.dataset.sort === value)?.textContent ?? '';
     };
     toggle.addEventListener('click', () => openMenu(menu.hidden === true));
-    items.forEach((item) => item.addEventListener('click', () => { sortBy(item.dataset.sort!); openMenu(false); toggle.focus(); }));
+    items.forEach((item) => item.addEventListener('click', () => { flip(() => sortBy(item.dataset.sort!)); openMenu(false); toggle.focus(); }));
     menu.addEventListener('keydown', (e) => {
       const i = items.indexOf(document.activeElement as HTMLButtonElement);
       if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
@@ -284,10 +325,10 @@ const sorts = [
     sortBy('random');
 
     if (searchInput) {
-      searchInput.addEventListener('input', () => { query = searchInput.value; apply(); });
+      searchInput.addEventListener('input', () => { query = searchInput.value; flip(apply); });
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        if (e.key === 'Escape') { searchInput.value = ''; query = ''; apply(); }
+        if (e.key === 'Escape') { searchInput.value = ''; query = ''; flip(apply); }
       });
       // the nav search button and Cmd/Ctrl+K jump to the hero search
       const focusSearch = () => { scrollTo({ top: 0, behavior: 'smooth' }); searchInput.focus({ preventScroll: true }); };
