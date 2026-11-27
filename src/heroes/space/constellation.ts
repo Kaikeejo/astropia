@@ -124,8 +124,7 @@ export const mount = createEngine<ConstellationSettings, State>({
       }
     }
     for (const [x, y, rgb] of pulses) {
-      ctx.fillStyle = rgba(WHITE, 0.9); ctx.beginPath(); ctx.arc(x, y, S.lineWidth + 0.6, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = rgba(rgb, 0.35); ctx.beginPath(); ctx.arc(x, y, S.lineWidth * 3 + 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = rgba(rgb, 1); ctx.beginPath(); ctx.arc(x, y, S.lineWidth + 1, 0, Math.PI * 2); ctx.fill();
     }
     // stars
     for (const d of dots) {
@@ -133,7 +132,6 @@ export const mount = createEngine<ConstellationSettings, State>({
       const tw = still ? 0.85 : 1 - S.twinkle * (0.5 + 0.5 * Math.sin(t * 2.2 + d.ph * 3));
       const rgb = d.tone < 0 ? WHITE : colors[d.tone] ?? colors[0];
       const r = S.dotSize * (d.big ? 1.9 : 1);
-      if (d.big) { ctx.fillStyle = rgba(rgb, 0.15 * tw); ctx.beginPath(); ctx.arc(x, y, r * 3.2, 0, Math.PI * 2); ctx.fill(); }
       ctx.fillStyle = rgba(rgb, (d.big ? 1 : 0.9) * tw);
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     }

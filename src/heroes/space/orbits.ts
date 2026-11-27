@@ -1,9 +1,9 @@
-// Orbits: planets and moons on thin rings around a glowing star (or two stars, or an atom's nucleus).
-import { createEngine, rgba, mix, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
+// Orbits: planets and moons on thin rings around a star (or an atom's nucleus). Every body is a solid dot.
+import { createEngine, rgba, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
 
 export interface OrbitsSettings {
   seed: number; colors: string[];
-  mode: 'system' | 'binary' | 'atom' | 'moons';
+  mode: 'system' | 'atom';
   planets: number; belt: number; stars: number;
   size: number; tilt: number; rotation: number;
   planetSize: number; sunSize: number;
@@ -24,7 +24,7 @@ export const DEFAULTS: OrbitsSettings = {
 
 export const CONTROLS: Ctrl[] = [
   { group: 'System' },
-  { key: 'mode', label: 'Type', type: 'select', options: ['system', 'binary', 'atom', 'moons'] },
+  { key: 'mode', label: 'Type', type: 'select', options: ['system', 'atom'] },
   { key: 'seed', label: 'Seed', type: 'range', min: 1, max: 999, step: 1 },
   { key: 'planets', label: 'Planets', type: 'range', min: 1, max: 10, step: 1 },
   { key: 'belt', label: 'Asteroids', type: 'range', min: 0, max: 2000, step: 50 },
@@ -57,12 +57,12 @@ export const mount = createEngine<OrbitsSettings, State>({
     const rings: Ring[] = [];
     const n = S.mode === 'atom' ? 3 : S.planets;
     for (let i = 0; i < n; i++) {
-      const u = S.mode === 'atom' ? 1 : S.mode === 'binary' ? 0.42 + 0.58 * (i + 1) / n : 0.2 + 0.8 * (i + 1) / n;
+      const u = S.mode === 'atom' ? 1 : 0.2 + 0.8 * (i + 1) / n;
       const ring: Ring = { r: u, rot: S.mode === 'atom' ? (i * 60) : 0, tilt: S.mode === 'atom' ? 0.28 : 1, bodies: [] };
       const count = S.mode === 'atom' ? 1 : 1;
       for (let k = 0; k < count; k++) ring.bodies.push({
         ph: rnd() * Math.PI * 2,
-        size: S.mode === 'atom' ? 7 : S.mode === 'moons' ? 1.5 + rnd() * 2.5 : 2.5 + rnd() * 5 * (0.5 + u),
+        size: S.mode === 'atom' ? 7 : 2.5 + rnd() * 5 * (0.5 + u),
         tone: i % Math.max(1, S.colors.length),
         moon: S.mode === 'system' && rnd() < 0.35 && u > 0.4 ? { r: 10 + rnd() * 8, ph: rnd() * 6 } : undefined,
       });
@@ -70,7 +70,7 @@ export const mount = createEngine<OrbitsSettings, State>({
     }
     const belt = [];
     if (S.belt > 0) {
-      const inner = S.mode === 'binary' ? 0.5 : 0.48, outer = inner + 0.16;
+      const inner = 0.48, outer = inner + 0.16;
       for (let i = 0; i < S.belt; i++) belt.push({ r: inner + (outer - inner) * (rnd() + rnd()) / 2, ph: rnd() * Math.PI * 2, tone: Math.floor(rnd() * S.colors.length), s: 0.6 + rnd() * 1.3 });
     }
     const stars = Array.from({ length: S.stars }, () => ({ x: rnd() * W, y: rnd() * H, s: rnd(), ph: rnd() * 6 }));
@@ -125,15 +125,11 @@ export const mount = createEngine<OrbitsSettings, State>({
         const [x, y, z] = pos(r, ang, ring.rot, ring.tilt);
         const size = b.size * k * S.planetSize;
         bodies.push({ x, y, z: S.mode === 'atom' ? 1 : z, draw: () => {
-          const rgb = colors[b.tone] ?? c0;
-          const g = ctx.createRadialGradient(x - size * 0.35, y - size * 0.35, size * 0.1, x, y, size);
-          g.addColorStop(0, rgba(mix(rgb, WHITE, 0.55), 1)); g.addColorStop(1, rgba(mix(rgb, [0, 0, 0], 0.25), 1));
-          ctx.fillStyle = rgba(rgb, 0.18); ctx.beginPath(); ctx.arc(x, y, size * 2.4, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = rgba(colors[b.tone] ?? c0, 1); ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2); ctx.fill();
           if (b.moon) {
             const ma = b.moon.ph + t * ws * 3;
             const mx = x + Math.cos(ma) * b.moon.r * k * S.planetSize, my = y + Math.sin(ma) * b.moon.r * k * S.planetSize * S.tilt;
-            ctx.fillStyle = rgba(WHITE, 0.85); ctx.beginPath(); ctx.arc(mx, my, Math.max(0.8, size * 0.28), 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = rgba(WHITE, 1); ctx.beginPath(); ctx.arc(mx, my, Math.max(0.8, size * 0.28), 0, Math.PI * 2); ctx.fill();
           }
         } });
       }
@@ -146,37 +142,20 @@ export const mount = createEngine<OrbitsSettings, State>({
       const s = a.s * Math.max(0.6, k); ctx.fillRect(x - s / 2, y - s / 2, s, s);
     }
 
-    // the centre: star(s), a big planet, or a nucleus
+    // the centre: star(s) or a nucleus, as solid dots
     const centre = () => {
       const sun = 18 * k * S.sunSize;
       if (S.sunSize <= 0) return;
-      const glow = (x: number, y: number, r: number, rgb: [number, number, number]) => {
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
-        g.addColorStop(0, rgba(WHITE, 1)); g.addColorStop(0.18, rgba(mix(rgb, WHITE, 0.4), 0.9)); g.addColorStop(0.45, rgba(rgb, 0.25)); g.addColorStop(1, rgba(rgb, 0));
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 4, 0, Math.PI * 2); ctx.fill();
+      const dot = (x: number, y: number, r: number, rgb: [number, number, number]) => {
+        ctx.fillStyle = rgba(rgb, 1); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
       };
-      if (S.mode === 'binary') {
-        const a = t * ws * 1.6, d = 26 * k * S.sunSize;
-        const [x1, y1] = pos(d, a, 0, 1), [x2, y2] = pos(d, a + Math.PI, 0, 1);
-        glow(x1, y1, sun * 0.7, c0); glow(x2, y2, sun * 0.55, c1);
-      } else if (S.mode === 'moons') {
-        const r = sun * 2.4;
-        const g = ctx.createRadialGradient(cx - r * 0.4, cy - r * 0.4, r * 0.1, cx, cy, r);
-        g.addColorStop(0, rgba(mix(c0, WHITE, 0.4), 1)); g.addColorStop(0.7, rgba(c0, 1)); g.addColorStop(1, rgba(mix(c0, [0, 0, 0], 0.5), 1));
-        ctx.fillStyle = rgba(c1, 0.12); ctx.beginPath(); ctx.arc(cx, cy, r * 1.6, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-        // a thin ring around the big planet
-        ctx.strokeStyle = rgba(c1, 0.6); ctx.lineWidth = 2 * k;
-        ctx.beginPath(); ctx.ellipse(cx, cy, r * 1.7, r * 1.7 * S.tilt * 0.6, rot, Math.PI * 1.02, Math.PI * 1.98); ctx.stroke();
-        ctx.lineWidth = 1;
-      } else if (S.mode === 'atom') {
+      if (S.mode === 'atom') {
         for (let i = 0; i < 7; i++) {
           const a = i * 2.4 + t * 0.6, d = i ? 13 * k : 0;
           const x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
-          ctx.fillStyle = rgba(i % 2 ? c1 : c0, 1); ctx.beginPath(); ctx.arc(x, y, 11 * k * S.sunSize, 0, Math.PI * 2); ctx.fill();
+          dot(x, y, 11 * k * S.sunSize, i % 2 ? c1 : c0);
         }
-        glow(cx, cy, sun * 0.6, c0);
-      } else glow(cx, cy, sun, c0);
+      } else dot(cx, cy, sun, c0);
     };
     // back half, centre, front half
     bodies.sort((a, b) => a.z - b.z);

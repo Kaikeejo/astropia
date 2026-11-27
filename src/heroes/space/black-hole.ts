@@ -1,10 +1,10 @@
 // Black hole: a disk of particles spiralling into a dark centre with a glowing ring,
-// plus a wormhole tunnel and a spinning pulsar.
+// plus a wormhole tunnel.
 import { createEngine, rgba, mix, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
 
 export interface BlackHoleSettings {
   seed: number; colors: string[];
-  mode: 'horizon' | 'wormhole' | 'pulsar';
+  mode: 'horizon' | 'wormhole';
   count: number; holeSize: number; size: number; tilt: number;
   particleSize: number; opacity: number; ringGlow: number;
   spin: number; infall: number;
@@ -21,7 +21,7 @@ export const DEFAULTS: BlackHoleSettings = {
 
 export const CONTROLS: Ctrl[] = [
   { group: 'Shape' },
-  { key: 'mode', label: 'Type', type: 'select', options: ['horizon', 'wormhole', 'pulsar'] },
+  { key: 'mode', label: 'Type', type: 'select', options: ['horizon', 'wormhole'] },
   { key: 'seed', label: 'Seed', type: 'range', min: 1, max: 999, step: 1 },
   { key: 'count', label: 'Particles', type: 'range', min: 200, max: 4000, step: 50 },
   { key: 'size', label: 'Size', type: 'range', min: 0.3, max: 2, step: 0.01 },
@@ -107,53 +107,27 @@ export const mount = createEngine<BlackHoleSettings, State>({
       return;
     }
 
-    if (S.mode === 'wormhole') {
-      // rings of light falling into the tunnel, twisting as they go
-      const rings = 26, per = Math.max(24, Math.round(S.count / rings));
-      glowDisc(rh * 3, c1, 0.35 * S.ringGlow);
-      for (let i = 0; i < rings; i++) {
-        const u = (((i / rings) - t * S.infall * 0.08) % 1 + 1) % 1; // 0 = deep inside, 1 = outer edge
-        const r = rh + (R * 1.2 - rh) * u * u;
-        const twist = (1 - u) * 4 * S.spin + t * S.spin * 0.4;
-        const rgb = mix(c1, c0, u);
-        const a = S.opacity * Math.min(1, u * 4) * (1 - u * 0.75);
-        for (let j = 0; j < per; j++) {
-          const ang = (j / per) * Math.PI * 2 + twist + (i % 2) * 0.2;
-          const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r * Math.max(0.35, S.tilt * 2.2);
-          const s = ps * (0.5 + u * 1.4);
-          ctx.fillStyle = rgba(j % 7 === 0 ? WHITE : rgb, a); ctx.fillRect(x - s / 2, y - s / 2, s, s);
-        }
+    // wormhole
+    // rings of light falling into the tunnel, twisting as they go
+    const rings = 26, per = Math.max(24, Math.round(S.count / rings));
+    glowDisc(rh * 3, c1, 0.35 * S.ringGlow);
+    for (let i = 0; i < rings; i++) {
+      const u = (((i / rings) - t * S.infall * 0.08) % 1 + 1) % 1; // 0 = deep inside, 1 = outer edge
+      const r = rh + (R * 1.2 - rh) * u * u;
+      const twist = (1 - u) * 4 * S.spin + t * S.spin * 0.4;
+      const rgb = mix(c1, c0, u);
+      const a = S.opacity * Math.min(1, u * 4) * (1 - u * 0.75);
+      for (let j = 0; j < per; j++) {
+        const ang = (j / per) * Math.PI * 2 + twist + (i % 2) * 0.2;
+        const x = cx + Math.cos(ang) * r, y = cy + Math.sin(ang) * r * Math.max(0.35, S.tilt * 2.2);
+        const s = ps * (0.5 + u * 1.4);
+        ctx.fillStyle = rgba(j % 7 === 0 ? WHITE : rgb, a); ctx.fillRect(x - s / 2, y - s / 2, s, s);
       }
-      ctx.globalCompositeOperation = 'destination-out';
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rh * 1.3);
-      g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rh * 1.3, 0, Math.PI * 2); ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-      return;
     }
-
-    // pulsar: a tiny bright star with two sweeping beams and rings rippling out
-    const core = Math.max(3, rh * 0.35);
-    for (let i = 0; i < 4; i++) {
-      const u = ((t * S.infall * 0.25 + i / 4) % 1);
-      ctx.strokeStyle = rgba(i % 2 ? c1 : c0, (1 - u) * 0.5 * S.opacity); ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.ellipse(cx, cy, u * R * 1.3, u * R * 1.3 * Math.max(0.3, S.tilt * 2), 0, 0, Math.PI * 2); ctx.stroke();
-    }
-    for (const p of st.ps) {
-      const a = p.a + t * S.spin * 0.3 / Math.max(0.2, p.r);
-      const r = rh * 1.5 + p.r * R;
-      const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * Math.max(0.3, S.tilt * 2);
-      ctx.fillStyle = rgba(p.u < 0.5 ? c0 : c1, S.opacity * (1 - p.r) * 0.7 * (0.4 + p.v)); const s = ps * (0.4 + p.v);
-      ctx.fillRect(x - s / 2, y - s / 2, s, s);
-    }
-    const ang = t * S.spin * 2.2 + 0.6;
-    for (const [dir, rgb] of [[0, c0], [Math.PI, c1]] as const) {
-      const a = ang + dir, len = R * 1.6, w = 0.1;
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, len);
-      g.addColorStop(0, rgba(WHITE, 0.9 * S.ringGlow)); g.addColorStop(0.15, rgba(rgb, 0.55 * S.ringGlow)); g.addColorStop(1, rgba(rgb, 0));
-      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, len, a - w, a + w); ctx.closePath(); ctx.fill();
-    }
-    glowDisc(core * 6, c1, 0.5 * S.ringGlow);
-    glowDisc(core * 2, WHITE, 1);
+    ctx.globalCompositeOperation = 'destination-out';
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rh * 1.3);
+    g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.7, 'rgba(0,0,0,0.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, rh * 1.3, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
   },
 });

@@ -1,4 +1,4 @@
-// Warp: stars fly out of the centre, from a gentle cruise to full hyperspace streaks.
+// Warp: stars fly out of the centre, from a gentle cruise to long streaks.
 import { createEngine, rgba, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime';
 
 export interface WarpSettings {
