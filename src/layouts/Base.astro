@@ -22,6 +22,12 @@ const { title, description = 'Animated, copy-paste hero sections for Astro.' } =
         try { pref = localStorage.getItem('theme') || 'system'; } catch (e) {}
         var light = pref === 'light' || (pref === 'system' && matchMedia('(prefers-color-scheme: light)').matches);
         document.documentElement.dataset.theme = light ? 'light' : 'dark';
+        // spot colours picked with the colour pickers (filter bar)
+        try {
+          var brand = JSON.parse(localStorage.getItem('brand') || '{}');
+          if (brand.blue) document.documentElement.style.setProperty('--brand-blue', brand.blue);
+          if (brand.pink) document.documentElement.style.setProperty('--brand-pink', brand.pink);
+        } catch (e) {}
       })();
     </script>
   </head>

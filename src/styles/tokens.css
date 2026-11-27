@@ -16,9 +16,14 @@
   --color-border-strong: #343b4d;
   --color-text: #f3f5f9;
   --color-text-muted: #9aa3b8;
-  --color-blue: #4c8dff;
-  --color-blue-strong: #2563eb;
-  --color-pink: #d92875;
+  /* The two spot colours. Everything blue or pink on the site comes from these two lines
+     (buttons, borders, links, pixel thumbnails, live heroes), so changing one changes all of them.
+     The colour pickers in the hero grid's filter bar set them live. */
+  --brand-blue: #4c8dff;
+  --brand-pink: #d92875;
+  --color-blue: var(--brand-blue);
+  --color-blue-strong: color-mix(in oklch, var(--brand-blue), black 18%);
+  --color-pink: var(--brand-pink);
   --color-cyan: #22d3ee;
   --color-overlay: #05060a;
 
@@ -39,8 +44,20 @@
   --starfield-opacity: 1;
 
   /* Gradient styles */
-  --gradient-button: linear-gradient(90deg, #d92875, #2563eb);
-  --gradient-border: linear-gradient(90deg, rgb(217 40 117 / 0.9), rgb(76 141 255 / 0.9));
+  --gradient-button: linear-gradient(90deg, var(--brand-pink), var(--color-blue-strong));
+  --gradient-border: linear-gradient(90deg, color-mix(in srgb, var(--brand-pink) 90%, transparent), color-mix(in srgb, var(--brand-blue) 90%, transparent));
+  /* stops for the animated pink/blue borders (search bar, glass buttons, cards, newsletter):
+     use as conic-gradient(from var(--some-angle), var(--brand-ring)) */
+  --brand-ring:
+    color-mix(in srgb, var(--brand-pink) 35%, transparent) 0deg,
+    color-mix(in srgb, var(--brand-pink), white 40%) 40deg,
+    color-mix(in srgb, var(--brand-pink) 50%, transparent) 80deg,
+    color-mix(in srgb, var(--brand-blue) 25%, transparent) 130deg,
+    color-mix(in srgb, var(--brand-blue) 35%, transparent) 180deg,
+    color-mix(in srgb, var(--brand-blue), white 40%) 220deg,
+    color-mix(in srgb, var(--brand-blue) 50%, transparent) 260deg,
+    color-mix(in srgb, var(--brand-pink) 25%, transparent) 310deg,
+    color-mix(in srgb, var(--brand-pink) 35%, transparent) 360deg;
 
   /* space/* */
   --space-8: 0.5rem;
@@ -89,9 +106,10 @@
   --color-border-strong: #c3cad8;
   --color-text: #0d1220;
   --color-text-muted: #556079;
-  --color-blue: #2563eb;
-  --color-blue-strong: #1d4ed8;
-  --color-pink: #c8186a;
+  /* a little deeper on white, for contrast */
+  --color-blue: color-mix(in oklch, var(--brand-blue), black 18%);
+  --color-blue-strong: color-mix(in oklch, var(--brand-blue), black 28%);
+  --color-pink: color-mix(in oklch, var(--brand-pink), black 8%);
   --color-cyan: #0e7490;
   --color-overlay: #0d1220;
 
@@ -120,8 +138,8 @@
   --glass-shadow-sm: inset 0 1px 1px rgb(255 255 255 / 0.08), inset 0 -6px 12px rgb(0 0 0 / 0.35), 0 0 0 1px rgb(0 0 0 / 0.5);
   --color-text: #f3f5f9;
   --color-text-muted: #9aa3b8;
-  --color-blue: #4c8dff;
-  --color-pink: #d92875;
+  --color-blue: var(--brand-blue);
+  --color-pink: var(--brand-pink);
 }
 
 @media (max-width: 1200px) {

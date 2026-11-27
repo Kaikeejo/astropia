@@ -14,7 +14,8 @@ const OX = (W - COLS * STEP + (STEP - CELL)) / 2, OY = (H - ROWS * STEP + (STEP 
 const cx = (COLS - 1) / 2, cy = (ROWS - 1) / 2;
 // the "core" is the part a small card thumbnail shows (≈ the Figma 320x200 thumbnail)
 const CORE_W = 53, CORE_H = 33;
-const BLUE = '#4C8DFF', PINK = '#D92875';
+// tones, not colours: each tone becomes its own SVG mask, filled with the site's CSS colour
+const BLUE = 'blue', PINK = 'pink';
 // single-colour designs (match the Featured card accents: Particle Galaxy = blue, Solar System = pink)
 const SOLO: Record<string, string> = { galaxy: BLUE, helix: PINK };
 
@@ -219,7 +220,7 @@ export function pixelPattern(name: PatternName): PixelLayer[] {
   for (const [k, o] of cells) {
     const [c, r] = k.split(',').map(Number);
     const mixed = ((c - spanStart) / span * .75 + colorNoise(c, r) * .5 + (rnd() - .5) * .3) > .62 ? PINK : BLUE;
-    const fill = white.has(k) ? '#FFFFFF' : SOLO[name] ?? mixed;
+    const fill = white.has(k) ? 'white' : SOLO[name] ?? mixed;
     const lvl = white.has(k) ? LEVELS - 1 : Math.min(LEVELS - 1, Math.floor(o * LEVELS));
     const g = fill + '|' + lvl;
     groups.set(g, (groups.get(g) ?? '') + `M${OX + c * STEP} ${OY + r * STEP}h${CELL}v${CELL}h-${CELL}z`);

@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type?: 'primary' | 'secondary' | 'grey';
+  type?: 'primary' | 'secondary' | 'grey' | 'glass';
   size?: 'large' | 'small';
   href?: string;
   class?: string;
@@ -36,4 +36,37 @@ const Tag = href ? 'a' : 'button';
   /* primary (pink/blue) hover: removed for now, new effect to come */
   .btn--secondary:hover { --gb-fill: var(--color-surface-2); }
   .btn:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+
+  /* glass: same smoky glass + animated pink/blue edge as the hero search bar */
+  .btn--glass {
+    position: relative;
+    isolation: isolate;
+    color: var(--color-text);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    -webkit-backdrop-filter: blur(10px) saturate(240%) brightness(1.15);
+    box-shadow: var(--glass-shadow);
+    transition: filter var(--dur) var(--ease);
+  }
+  .btn--glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--btn-border-angle),
+      var(--brand-ring)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: btn-border-spin 8s linear infinite;
+    pointer-events: none;
+  }
+  .btn--glass > :global(*) { position: relative; }
+  .btn--glass:hover { filter: brightness(1.25); }
+  @property --btn-border-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+  @keyframes btn-border-spin { to { --btn-border-angle: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .btn--glass::before { animation: none; } }
 </style>

@@ -56,15 +56,7 @@ import Starfield from '../ui/Starfield.astro';
     padding: 1px;
     background: conic-gradient(
       from var(--ring-angle),
-      rgb(217 40 117 / 0.35) 0deg,
-      rgb(255 120 180 / 1) 40deg,
-      rgb(217 40 117 / 0.5) 80deg,
-      rgb(76 141 255 / 0.25) 130deg,
-      rgb(76 141 255 / 0.35) 180deg,
-      rgb(150 195 255 / 1) 220deg,
-      rgb(76 141 255 / 0.5) 260deg,
-      rgb(217 40 117 / 0.25) 310deg,
-      rgb(217 40 117 / 0.35) 360deg
+      var(--brand-ring)
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
@@ -87,8 +79,8 @@ import Starfield from '../ui/Starfield.astro';
   .email__submit {
     --k: cos(calc(var(--ring-angle) - 50deg));
     --color-blue: color-mix(in oklab,
-      #d92875 calc(clamp(0, var(--k) * 2, 1) * 100%),
-      color-mix(in oklab, #4c8dff calc(clamp(0, var(--k) * -2, 1) * 100%), #9aa3b8));
+      var(--brand-pink) calc(clamp(0, var(--k) * 2, 1) * 100%),
+      color-mix(in oklab, var(--brand-blue) calc(clamp(0, var(--k) * -2, 1) * 100%), #9aa3b8));
   }
   .email__submit :global(rect) { transition: opacity 300ms var(--ease), translate 300ms var(--ease); }
   .email__submit:hover :global(rect) { translate: 3px 0; transition-delay: calc(var(--i) * 12ms); }

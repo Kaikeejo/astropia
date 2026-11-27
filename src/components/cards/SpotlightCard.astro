@@ -42,15 +42,7 @@ const { name, initials, role, patterns } = Astro.props.author.data;
     padding: 1px;
     background: conic-gradient(
       from var(--border-angle),
-      rgb(217 40 117 / 0.35) 0deg,
-      rgb(255 120 180 / 1) 40deg,
-      rgb(217 40 117 / 0.5) 80deg,
-      rgb(76 141 255 / 0.25) 130deg,
-      rgb(76 141 255 / 0.35) 180deg,
-      rgb(150 195 255 / 1) 220deg,
-      rgb(76 141 255 / 0.5) 260deg,
-      rgb(217 40 117 / 0.25) 310deg,
-      rgb(217 40 117 / 0.35) 360deg
+      var(--brand-ring)
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;

@@ -2,26 +2,29 @@
 import Icon from '../ui/Icon.astro';
 import Button from '../ui/Button.astro';
 import Starfield from '../ui/Starfield.astro';
+import PixelField from '../../heroes/pixel-field/PixelField.astro';
 ---
 
 <dialog class="qp" aria-labelledby="qp-title">
   <div class="qp__modal">
     <header class="qp__header">
       <p class="qp__title paragraph muted">Quick preview <span aria-hidden="true">·</span> <span class="h6" id="qp-title" data-qp-title>Hero</span></p>
-      <span class="qp__url paragraph muted"><Icon name="globe" size={16} /><span data-qp-url>astropia.dev/preview</span></span>
+      <a class="qp__url paragraph muted" data-qp-link><Icon name="globe" size={16} /><span data-qp-url>astropia.dev/preview</span></a>
       <div class="qp__actions">
-        <Button type="primary" size="small" data-qp-copy>Copy component</Button>
+        <Button type="glass" size="small" data-qp-copy>Copy component</Button>
         <button type="button" class="qp__close btn-raised" aria-label="Close preview" data-qp-close><Icon name="x" size={20} /></button>
       </div>
     </header>
     <div class="qp__body">
-      <Starfield />
-      <p class="accent muted" data-qp-eyebrow>Hero</p>
-      <h2 class="h1">Your headline here</h2>
-      <p class="h5 muted">This is how your own content sits on top of the animation.</p>
+      <div class="qp__bg" data-qp-bg="starfield"><Starfield /></div>
+      <div class="qp__bg" data-qp-bg="pixel-field" hidden><PixelField id="qp-pf" /></div>
+      <div class="qp__copy">
+        <h2 class="h2" data-qp-heading>Hero</h2>
+        <p class="h5 muted">This is how your own content sits on top of the animation.</p>
+      </div>
       <div class="qp__buttons">
-        <Button type="primary">Get started</Button>
-        <Button type="secondary">Learn more</Button>
+        <Button type="glass">Get started</Button>
+        <Button type="grey">Learn more</Button>
       </div>
     </div>
   </div>
@@ -45,11 +48,17 @@ import Starfield from '../ui/Starfield.astro';
   .qp__actions { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: var(--space-8); }
   .qp__close { width: 40px; height: 40px; padding: 0; }
   .qp__body { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-24); text-align: center; background: var(--color-bg); overflow: hidden; }
-  .qp__body > :not(.starfield) { position: relative; }
+  .qp__body > :not(.qp__bg) { position: relative; }
+  .qp__bg { position: absolute; inset: 0; }
+  .qp__bg[hidden] { display: none; }
+  a.qp__url { text-decoration: none; }
+  a.qp__url[href]:hover { color: var(--color-text); }
+  .qp__copy { display: flex; flex-direction: column; gap: var(--space-8); } /* heading sits close to its paragraph */
   .qp__buttons { display: flex; gap: var(--space-16); }
 </style>
 
 <script>
+  import { DEFAULTS, type PixelFieldInstance } from '../../heroes/pixel-field/engine';
   const dialog = document.querySelector<HTMLDialogElement>('.qp');
   if (dialog) {
     const set = (sel: string, text: string) => dialog.querySelector(sel)!.textContent = text;
@@ -57,7 +66,17 @@ import Starfield from '../ui/Starfield.astro';
       btn.addEventListener('click', () => {
         set('[data-qp-title]', btn.dataset.title ?? 'Hero');
         set('[data-qp-url]', `astropia.dev/preview/${btn.dataset.preview}`);
-        set('[data-qp-eyebrow]', `${btn.dataset.title} · ${btn.dataset.category}`);
+        set('[data-qp-heading]', btn.dataset.title ?? 'Hero');
+        // background: the hero's own live engine when it has one, otherwise the starfield placeholder
+        const engine = btn.dataset.engine ?? 'starfield';
+        dialog.querySelectorAll<HTMLElement>('[data-qp-bg]').forEach((bg) => { bg.hidden = bg.dataset.qpBg !== engine; });
+        if (engine === 'pixel-field') {
+          const pf = document.getElementById('qp-pf') as HTMLElement & { pixelField?: PixelFieldInstance };
+          pf.pixelField?.update({ ...DEFAULTS, ...JSON.parse(btn.dataset.settings || '{}') });
+        }
+        // the URL pill opens the full hero page when there is one
+        const link = dialog.querySelector<HTMLAnchorElement>('[data-qp-link]')!;
+        if (btn.dataset.engine) link.href = `/heroes/${btn.dataset.preview}`; else link.removeAttribute('href');
         dialog.showModal();
       });
     });

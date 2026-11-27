@@ -1,0 +1,14 @@
+---
+// One page per hero that has a live engine (e.g. every card in the Pixels category).
+import { getCollection } from 'astro:content';
+import PixelPlayground from '../../heroes/pixel-field/Playground.astro';
+
+export async function getStaticPaths() {
+  const heroes = await getCollection('heroes', (h) => !!h.data.engine);
+  return heroes.map((hero) => ({ params: { id: hero.id }, props: { hero } }));
+}
+const { hero } = Astro.props;
+const { title, engine, settings } = hero.data;
+---
+
+{engine === 'pixel-field' && <PixelPlayground title={title} settings={settings} />}

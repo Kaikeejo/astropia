@@ -20,8 +20,10 @@ const { name, vignette = true, blank = false } = Astro.props;
 {STYLE === 'lines' ? <PatternLines name={name} vignette={vignette} /> : (
   <div class="pattern" aria-hidden="true">
     <div class="pattern__canvas">
-      <!-- static SVG built by src/pages/patterns/[name].svg.ts -->
-      {!blank && <img src={`/patterns/${name}.svg`} width={W} height={H} alt="" loading="lazy" decoding="async" />}
+      <!-- static SVG masks built by src/pages/patterns/[name].svg.ts, painted with the spot colours -->
+      {!blank && ['blue', 'pink', 'white'].map((tone) => (
+        <span class={`pattern__tone pattern__tone--${tone}`} style={`--mask: url(/patterns/${name}-${tone}.svg)`}></span>
+      ))}
     </div>
     {vignette && <div class="pattern__vignette"></div>}
   </div>
@@ -48,7 +50,14 @@ const { name, vignette = true, blank = false } = Astro.props;
     translate: -50% -50%;
     transition: scale 600ms var(--ease);
   }
-  .pattern__canvas img { display: block; }
+  .pattern__tone {
+    position: absolute; inset: 0;
+    -webkit-mask: var(--mask) no-repeat 0 0 / 100% 100%;
+    mask: var(--mask) no-repeat 0 0 / 100% 100%;
+  }
+  .pattern__tone--blue { background: var(--brand-blue); }
+  .pattern__tone--pink { background: var(--brand-pink); }
+  .pattern__tone--white { background: #fff; }
   .pattern__vignette {
     position: absolute;
     inset: 0;

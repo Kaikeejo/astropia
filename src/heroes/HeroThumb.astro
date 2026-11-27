@@ -1,0 +1,29 @@
+---
+// Static preview of a live hero for its card thumbnail: one frame drawn on a canvas,
+// only when the card scrolls near the screen. No animation loop, so it costs almost nothing.
+interface Props { engine: string; settings?: Record<string, unknown> }
+const { engine, settings = {} } = Astro.props;
+---
+
+<div class="hero-thumb" data-hero-thumb={engine} data-settings={JSON.stringify(settings)} aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .hero-thumb { position: absolute; inset: 0; background: rgb(var(--pattern-bg-rgb)); transition: scale var(--dur) var(--ease); }
+  .hero-thumb canvas { display: block; width: 100%; height: 100%; }
+</style>
+
+<script>
+  import { mount } from './pixel-field/engine';
+  const thumbs = document.querySelectorAll<HTMLElement>('[data-hero-thumb]');
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const el = e.target as HTMLElement;
+      io.unobserve(el);
+      if (el.dataset.heroThumb === 'pixel-field') mount(el, JSON.parse(el.dataset.settings || '{}'), { still: true, fit: true });
+    }
+  }, { rootMargin: '300px' });
+  thumbs.forEach((t) => io.observe(t));
+</script>

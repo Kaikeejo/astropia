@@ -16,6 +16,8 @@ const heroes = defineCollection({
     pattern,
     likes: z.number(),
     order: z.number(),
+    engine: z.enum(['pixel-field']).optional(), // live hero: gets its own page at /heroes/<id>
+    settings: z.record(z.string(), z.any()).optional(), // engine settings (preset) for this hero
   }),
 });
 

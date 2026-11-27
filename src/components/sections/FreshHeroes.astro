@@ -4,7 +4,8 @@ import Chip from '../ui/Chip.astro';
 import Icon from '../ui/Icon.astro';
 import HeroCard from '../cards/HeroCard.astro';
 const heroes = (await getCollection('heroes')).sort((a, b) => a.data.order - b.data.order);
-const filters = ['All', 'Space', 'Particles', '3D', 'Canvas', 'Shaders', 'Intro animation'];
+// filter chips come from the heroes' categories, so a new category shows up automatically
+const filters = ['All', ...new Set(heroes.map((h) => h.data.category))];
 const sorts = [
   { value: 'popular', label: 'Popular' },
   { value: 'newest', label: 'Newest' },
@@ -23,6 +24,15 @@ const sorts = [
         {filters.map((f, i) => <Chip value={f} active={i === 0}>{f}</Chip>)}
       </div>
       <span class="fresh__spacer"></span>
+      <div class="brand-picker btn-raised" role="group" aria-label="Site colours">
+        <label class="brand-picker__swatch" style="--swatch: var(--brand-blue)" title="Change the blue">
+          <input type="color" data-brand="blue" aria-label="Blue spot colour" />
+        </label>
+        <label class="brand-picker__swatch" style="--swatch: var(--brand-pink)" title="Change the pink">
+          <input type="color" data-brand="pink" aria-label="Pink spot colour" />
+        </label>
+        <button type="button" class="brand-picker__reset" data-brand-reset hidden aria-label="Reset colours" title="Reset colours"><Icon name="x" size={16} /></button>
+      </div>
       <div class="sort">
         <button type="button" class="fresh__sort btn-raised paragraph" aria-haspopup="menu" aria-expanded="false" aria-controls="sort-menu" data-sort-toggle>
           Sort: <span data-sort-label>Popular</span> <Icon name="chevron-down" size={16} />
@@ -85,6 +95,15 @@ const sorts = [
   }
   .segmented.no-anim .segmented__thumb { transition: none; }
   .fresh__sort { padding: var(--space-8) var(--space-16); }
+  /* two spot-colour pickers in a grey pill, in front of the sort */
+  .brand-picker { display: flex; align-items: center; gap: var(--space-8); padding: var(--space-8) var(--space-12, 0.75rem); border-radius: var(--radius-full); margin-right: calc(var(--space-8) * -1); }
+  .brand-picker__swatch { position: relative; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--swatch); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25); cursor: pointer; transition: scale var(--dur) var(--ease); }
+  .brand-picker__swatch:hover { scale: 1.12; }
+  .brand-picker__swatch:has(input:focus-visible) { outline: 2px solid var(--color-text); outline-offset: 2px; }
+  .brand-picker__swatch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+  .brand-picker__reset { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--color-text-muted); cursor: pointer; }
+  .brand-picker__reset[hidden] { display: none; }
+  .brand-picker__reset:hover { color: var(--color-text); }
   .fresh__sort :global(svg) { color: var(--color-text); transition: rotate var(--dur) var(--ease); }
   .fresh__sort[aria-expanded='true'] :global(svg) { rotate: 180deg; }
   /* sort dropdown: same raised grey language as the buttons */
@@ -210,5 +229,31 @@ const sorts = [
       document.querySelector('.navbar__search')?.addEventListener('click', focusSearch);
       addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); focusSearch(); } });
     }
+  }
+
+  // Spot colour pickers: set --brand-blue / --brand-pink on the page, so every blue and pink
+  // (buttons, borders, thumbnails, live heroes) follows. Saved in this browser.
+  {
+    const root = document.documentElement;
+    const DEFAULT = { blue: '#4c8dff', pink: '#d92875' };
+    const read = (): Record<string, string> => { try { return JSON.parse(localStorage.getItem('brand') || '{}'); } catch { return {}; } };
+    const inputs = document.querySelectorAll<HTMLInputElement>('[data-brand]');
+    const reset = document.querySelector<HTMLButtonElement>('[data-brand-reset]');
+    const sync = () => {
+      const saved = read();
+      inputs.forEach((i) => { i.value = saved[i.dataset.brand!] ?? DEFAULT[i.dataset.brand as 'blue' | 'pink']; });
+      if (reset) reset.hidden = !saved.blue && !saved.pink;
+    };
+    const apply = (saved: Record<string, string>) => {
+      for (const k of ['blue', 'pink']) saved[k] ? root.style.setProperty(`--brand-${k}`, saved[k]) : root.style.removeProperty(`--brand-${k}`);
+      try { localStorage.setItem('brand', JSON.stringify(saved)); } catch {}
+      dispatchEvent(new Event('astropia:brand'));
+    };
+    inputs.forEach((input) => input.addEventListener('input', () => {
+      apply({ ...read(), [input.dataset.brand!]: input.value });
+      if (reset) reset.hidden = false;
+    }));
+    reset?.addEventListener('click', () => { apply({}); sync(); });
+    sync();
   }
 </script>

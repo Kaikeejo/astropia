@@ -1,0 +1,26 @@
+---
+// <PixelField /> : animated pixel background for a hero section.
+// Transparent (no background colour), fills its parent: give the parent `position: relative`.
+// Every prop is optional; see engine.ts for the full list and defaults.
+import { DEFAULTS, type PixelFieldSettings } from './engine';
+
+interface Props extends Partial<PixelFieldSettings> { id?: string; class?: string }
+const { id, class: cls, ...props } = Astro.props;
+const settings = { ...DEFAULTS, ...props };
+---
+
+<div id={id} class:list={['pixel-field-hero', cls]} data-pixel-field={JSON.stringify(settings)} aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<style>
+  .pixel-field-hero { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .pixel-field-hero canvas { display: block; width: 100%; height: 100%; }
+</style>
+
+<script>
+  import { mount, type PixelFieldInstance } from './engine';
+  document.querySelectorAll<HTMLElement & { pixelField?: PixelFieldInstance }>('[data-pixel-field]').forEach((el) => {
+    el.pixelField = mount(el, JSON.parse(el.dataset.pixelField || '{}'));
+  });
+</script>
