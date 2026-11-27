@@ -1,0 +1,56 @@
+---
+// Subtle, sparse pixel texture in the style of the Astropia logo mark.
+// Same cell/step as the mark (4px squares on a 6px grid), white only, very low opacity.
+// A few stamps of the logo shape plus scattered single pixels. Generated once at build.
+interface Props { seed?: number; class?: string }
+const { seed: seed0 = 7, class: cls } = Astro.props;
+const W = 1440, H = 480, STEP = 6, CELL = 4;
+const COLS = Math.floor(W / STEP), ROWS = Math.floor(H / STEP);
+
+let seed = seed0;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+// the logo mark (0 = empty, otherwise relative strength; 'w' = brightest)
+const mark: (number | 'w')[][] = [
+  [0, 0.35, 1, 0],
+  [0.6, 1, 'w', 0.5],
+  [0, 0.8, 1, 0.25],
+  [0.2, 0, 0.55, 0],
+];
+const cells = new Map<string, number>();
+const put = (c: number, r: number, o: number) => {
+  if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return;
+  const k = `${c},${r}`;
+  cells.set(k, Math.max(cells.get(k) ?? 0, o));
+};
+
+// logo stamps, randomly flipped so they don't look copy-pasted
+for (let i = 0; i < 12; i++) {
+  const c0 = Math.floor(rnd() * (COLS - 4)), r0 = Math.floor(rnd() * (ROWS - 4));
+  const fx = rnd() < 0.5, fy = rnd() < 0.5, base = 0.07 + rnd() * 0.06;
+  mark.forEach((row, r) => row.forEach((v, c) => {
+    if (!v) return;
+    const s = v === 'w' ? 1 : v;
+    put(c0 + (fx ? 3 - c : c), r0 + (fy ? 3 - r : r), base * s);
+  }));
+}
+// scattered single pixels
+for (let i = 0; i < 260; i++) {
+  put(Math.floor(rnd() * COLS), Math.floor(rnd() * ROWS), 0.03 + rnd() * 0.05);
+}
+const rects = [...cells].map(([k, o]) => { const [c, r] = k.split(',').map(Number); return { x: c * STEP, y: r * STEP, o }; });
+---
+
+<svg class:list={['pixel-field', cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  {rects.map((p) => <rect x={p.x} y={p.y} width={CELL} height={CELL} rx="1" fill="#fff" opacity={p.o.toFixed(3)} />)}
+</svg>
+
+<style>
+  .pixel-field {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    /* fade in from the top so the texture sits low in the footer */
+    -webkit-mask: linear-gradient(to bottom, transparent, #000 60%);
+    mask: linear-gradient(to bottom, transparent, #000 60%);
+  }
+</style>
