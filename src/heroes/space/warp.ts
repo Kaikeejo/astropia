@@ -4,13 +4,14 @@ import { createEngine, rgba, COLORS_DEFAULT, WHITE, type Ctrl } from '../runtime
 export interface WarpSettings {
   seed: number; colors: string[];
   shape: 'field' | 'tunnel';
+  look: 'streaks' | 'stars'; // stars: round stars with a very soft fading trail
   count: number; speed: number; streak: number; size: number;
   white: number; opacity: number; centerFade: number;
   focusX: number; focusY: number; mouse: 'none' | 'steer';
 }
 
 export const DEFAULTS: WarpSettings = {
-  seed: 7, colors: COLORS_DEFAULT, shape: 'field',
+  seed: 7, colors: COLORS_DEFAULT, shape: 'field', look: 'streaks',
   count: 800, speed: 0.6, streak: 0.4, size: 1.6,
   white: 0.5, opacity: 1, centerFade: 0.15,
   focusX: 0.5, focusY: 0.5, mouse: 'steer',
@@ -19,6 +20,7 @@ export const DEFAULTS: WarpSettings = {
 export const CONTROLS: Ctrl[] = [
   { group: 'Stars' },
   { key: 'shape', label: 'Shape', type: 'select', options: ['field', 'tunnel'] },
+  { key: 'look', label: 'Look', type: 'select', options: ['streaks', 'stars'] },
   { key: 'seed', label: 'Seed', type: 'range', min: 1, max: 999, step: 1 },
   { key: 'count', label: 'Amount', type: 'range', min: 50, max: 1500, step: 10 },
   { key: 'size', label: 'Star size', type: 'range', min: 0.5, max: 4, step: 0.1 },
@@ -28,7 +30,7 @@ export const CONTROLS: Ctrl[] = [
   { key: 'white', label: 'White stars', type: 'range', min: 0, max: 1, step: 0.01 },
   { group: 'Motion' },
   { key: 'speed', label: 'Speed', type: 'range', min: -2, max: 3, step: 0.05 },
-  { key: 'streak', label: 'Streaks', type: 'range', min: 0, max: 1, step: 0.01 },
+  { key: 'streak', label: 'Trail length', type: 'range', min: 0, max: 1, step: 0.01 },
   { key: 'centerFade', label: 'Centre fade', type: 'range', min: 0, max: 0.6, step: 0.01 },
   { key: 'focusX', label: 'Centre X', type: 'range', min: 0, max: 1, step: 0.01 },
   { key: 'focusY', label: 'Centre Y', type: 'range', min: 0, max: 1, step: 0.01 },
@@ -79,7 +81,19 @@ export const mount = createEngine<WarpSettings, State>({
       if (a < 0.01) continue;
       const rgb = s.tone < 0 ? WHITE : colors[s.tone] ?? colors[0];
       const w = S.size * (0.45 + near * 1.6);
-      if (tail !== 0) {
+      if (S.look === 'stars') {
+        // a round star, with a soft trail that fades to nothing behind it
+        if (tail !== 0) {
+          const z2 = Math.min(1, s.z + tail * (0.4 + Math.abs(S.speed)));
+          const qx = st.cx + (s.x / z2) * R, qy = st.cy + (s.y / z2) * R;
+          const g = ctx.createLinearGradient(qx, qy, px, py);
+          g.addColorStop(0, rgba(rgb, 0)); g.addColorStop(1, rgba(rgb, a * 0.35));
+          ctx.strokeStyle = g; ctx.lineWidth = w * 0.7;
+          ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(px, py); ctx.stroke();
+        }
+        ctx.fillStyle = rgba(rgb, a);
+        ctx.beginPath(); ctx.arc(px, py, w * 0.75, 0, Math.PI * 2); ctx.fill();
+      } else if (tail !== 0) {
         const z2 = Math.min(1, s.z + tail * (0.4 + Math.abs(S.speed)));
         const qx = st.cx + (s.x / z2) * R, qy = st.cy + (s.y / z2) * R;
         ctx.strokeStyle = rgba(rgb, a); ctx.lineWidth = w;

@@ -7,7 +7,6 @@ const ENGINES: Record<string, () => Promise<{ mount: Mount }>> = {
   'pixel-field': () => import('./pixel-field/engine') as any,
   warp: () => import('./space/warp') as any,
   constellation: () => import('./space/constellation') as any,
-  orbits: () => import('./space/orbits') as any,
   nebula: () => import('./space/nebula') as any,
   'black-hole': () => import('./space/black-hole') as any,
 };
