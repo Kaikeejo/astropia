@@ -10,6 +10,7 @@ import Starfield from '../ui/Starfield.astro';
       <p class="qp__title paragraph muted">Quick preview <span aria-hidden="true">·</span> <span class="h6" id="qp-title" data-qp-title>Hero</span></p>
       <a class="qp__url paragraph muted" data-qp-link><Icon name="globe" size={16} /><span data-qp-url>astropia.dev/preview</span></a>
       <div class="qp__actions">
+        <Button type="grey" size="small" data-qp-hide aria-pressed="false">Hide content</Button>
         <Button type="glass" size="small" data-qp-copy>Copy component</Button>
         <button type="button" class="qp__close btn-raised" aria-label="Close preview" data-qp-close><Icon name="x" size={20} /></button>
       </div>
@@ -17,11 +18,11 @@ import Starfield from '../ui/Starfield.astro';
     <div class="qp__body">
       <div class="qp__bg" data-qp-bg="starfield"><Starfield /></div>
       <div class="qp__bg" data-qp-live hidden></div>
-      <div class="qp__copy">
+      <div class="qp__copy" data-qp-content>
         <h2 class="h2" data-qp-heading>Hero</h2>
         <p class="h5 muted">This is how your own content sits on top of the animation.</p>
       </div>
-      <div class="qp__buttons">
+      <div class="qp__buttons" data-qp-content>
         <Button type="glass">Get started</Button>
         <Button type="grey">Learn more</Button>
       </div>
@@ -55,6 +56,9 @@ import Starfield from '../ui/Starfield.astro';
   a.qp__url[href]:hover { color: var(--color-text); }
   .qp__copy { display: flex; flex-direction: column; gap: var(--space-8); } /* heading sits close to its paragraph */
   .qp__buttons { display: flex; gap: var(--space-16); }
+  /* "Hide content": fade the sample heading, paragraph and buttons so only the hero shows */
+  [data-qp-content] { transition: opacity var(--dur) var(--ease), visibility var(--dur) var(--ease); }
+  .qp__body.is-clean [data-qp-content] { opacity: 0; visibility: hidden; }
 </style>
 
 <script>
@@ -85,6 +89,15 @@ import Starfield from '../ui/Starfield.astro';
     });
     dialog.querySelector('[data-qp-close]')!.addEventListener('click', () => dialog.close());
     dialog.addEventListener('close', stop); // stop the animation when the popup closes
+
+    // Hide / show the sample content (stays as you left it while browsing other previews)
+    const hideBtn = dialog.querySelector<HTMLButtonElement>('[data-qp-hide]')!;
+    const body = dialog.querySelector<HTMLElement>('.qp__body')!;
+    hideBtn.addEventListener('click', () => {
+      const hidden = body.classList.toggle('is-clean');
+      hideBtn.setAttribute('aria-pressed', String(hidden));
+      hideBtn.textContent = hidden ? 'Show content' : 'Hide content';
+    });
     // click on the dimmed backdrop closes too
     dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
   }
