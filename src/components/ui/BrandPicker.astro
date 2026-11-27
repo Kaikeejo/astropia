@@ -6,15 +6,15 @@ const PRESETS = ['#4C8DFF', '#D92875', '#22D3EE', '#14B8A6', '#22C55E', '#A3E635
 ---
 
 <div class="brand-picker" data-brand-picker>
-  <div class="brand-picker__pill" role="group" aria-label="Site colours">
-    <button type="button" class="brand-picker__swatch" style="--swatch: var(--brand-blue)" data-brand-open="blue" aria-label="Change the blue" aria-haspopup="dialog" aria-expanded="false"></button>
-    <button type="button" class="brand-picker__swatch" style="--swatch: var(--brand-pink)" data-brand-open="pink" aria-label="Change the pink" aria-haspopup="dialog" aria-expanded="false"></button>
+  <div class="brand-picker__pill" role="group" aria-label="Site colors">
+    <button type="button" class="brand-picker__swatch" style="--swatch: var(--brand-blue)" data-brand-open="blue" aria-label="Change color 1" aria-haspopup="dialog" aria-expanded="false"></button>
+    <button type="button" class="brand-picker__swatch" style="--swatch: var(--brand-pink)" data-brand-open="pink" aria-label="Change color 2" aria-haspopup="dialog" aria-expanded="false"></button>
   </div>
 
-  <div class="cp" role="dialog" aria-label="Spot colour" data-cp hidden>
+  <div class="cp" role="dialog" aria-label="Spot color" data-cp hidden>
     <div class="cp__tabs" role="tablist">
-      <button type="button" role="tab" class="cp__tab" data-cp-tab="blue"><span style="--swatch: var(--brand-blue)"></span>Blue</button>
-      <button type="button" role="tab" class="cp__tab" data-cp-tab="pink"><span style="--swatch: var(--brand-pink)"></span>Pink</button>
+      <button type="button" role="tab" class="cp__tab" data-cp-tab="blue"><span style="--swatch: var(--brand-blue)"></span>Color 1</button>
+      <button type="button" role="tab" class="cp__tab" data-cp-tab="pink"><span style="--swatch: var(--brand-pink)"></span>Color 2</button>
     </div>
     <div class="cp__area" data-cp-area role="slider" tabindex="0" aria-label="Saturation and brightness">
       <span class="cp__thumb" data-cp-area-thumb></span>
@@ -25,7 +25,7 @@ const PRESETS = ['#4C8DFF', '#D92875', '#22D3EE', '#14B8A6', '#22C55E', '#A3E635
     <label class="cp__hex">
       <span class="cp__preview" data-cp-preview></span>
       <span class="cp__hash" aria-hidden="true">#</span>
-      <input type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex colour" data-cp-hex />
+      <input type="text" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Hex color" data-cp-hex />
     </label>
     <div class="cp__presets">
       {PRESETS.map((c) => <button type="button" class="cp__preset" style={`--swatch: ${c}`} data-cp-preset={c} aria-label={c} title={c}></button>)}
