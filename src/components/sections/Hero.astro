@@ -1,12 +1,10 @@
 ---
 import Starfield from '../ui/Starfield.astro';
-import Nebula from '../ui/Nebula.astro';
 import Icon from '../ui/Icon.astro';
 ---
 
 <section class="hero section" id="explore">
   <Starfield />
-  <Nebula />
   <div class="hero__glow" aria-hidden="true"></div>
   <h1 class="h1">Astro Resources</h1>
   <p class="h5 muted hero__lead">Tweak 3D and particle hero sections live, then copy one component straight into your Astro project.</p>
@@ -28,10 +26,9 @@ import Icon from '../ui/Icon.astro';
     padding-top: 8rem;
     padding-bottom: var(--space-48);
   }
-  .hero > :not(.starfield, .hero__glow, .nebula) { position: relative; }
+  .hero > :not(.starfield, .hero__glow) { position: relative; }
   /* starfield + glow sit behind all content and bleed into the next section */
-  .hero :global(.starfield),
-  .hero :global(.nebula) {
+  .hero :global(.starfield) {
     z-index: -1;
     top: 0;
     bottom: auto;
