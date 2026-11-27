@@ -2,7 +2,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { background: var(--color-bg); color-scheme: dark; }
+html { background: var(--color-bg); color-scheme: dark; transition: background-color var(--dur) var(--ease); }
 body {
   margin: 0;
   /* no background here: the page color comes from <html>, so layers with z-index:-1 (hero starfield/glow) stay visible */

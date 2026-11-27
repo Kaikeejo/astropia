@@ -29,14 +29,14 @@ import Starfield from '../ui/Starfield.astro';
 
 <style>
   .qp { padding: 0; border: 0; background: none; max-width: none; max-height: none; width: min(1312px, calc(100vw - 64px)); height: min(784px, calc(100vh - 64px)); color: var(--color-text); }
-  .qp::backdrop { background: rgb(5 6 10 / 0.6); backdrop-filter: blur(8px); }
+  .qp::backdrop { background: var(--backdrop); backdrop-filter: blur(8px); }
   .qp[open] .qp__modal { animation: qp-in 260ms var(--ease); }
   @keyframes qp-in { from { opacity: 0; scale: 0.97; translate: 0 12px; } }
   .qp__modal {
     display: flex; flex-direction: column; height: 100%;
     border-radius: var(--radius-md); overflow: hidden;
     background: var(--color-surface); border: 1px solid var(--color-border);
-    box-shadow: 0 24px 64px rgb(0 0 0 / 0.6);
+    box-shadow: var(--shadow-lg);
   }
   .qp__header { display: flex; align-items: center; gap: var(--space-16); padding: var(--space-16) var(--space-24); border-bottom: 1px solid var(--color-border); }
   .qp__title { flex: 1; display: flex; align-items: center; gap: var(--space-8); }

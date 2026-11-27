@@ -46,7 +46,7 @@ const layers = LAYERS.map((l, i) => ({ ...l, bg: tile(l, 42 + i * 7919) }));
 </div>
 
 <style>
-  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; filter: var(--starfield-filter); opacity: var(--starfield-opacity); }
   .starfield__layer {
     position: absolute; inset: -2rem;
     translate: calc(var(--mx, 0) * var(--depth)) calc(var(--my, 0) * var(--depth));

@@ -30,7 +30,7 @@ const { name, vignette = true, blank = false } = Astro.props;
 <style>
   /* same frame, crop and vignette as the line thumbnails, so every card layout keeps working */
   .pattern {
-    --pattern-bg: var(--pattern-bg-override, 10 11 16);
+    --pattern-bg: var(--pattern-bg-override, var(--pattern-bg-rgb));
     position: absolute;
     inset: 0;
     overflow: hidden;
