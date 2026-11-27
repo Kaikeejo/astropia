@@ -189,6 +189,29 @@ export function pixelPattern(name: PatternName): PixelLayer[] {
   } else {
     generators[keyName](put, rnd);
   }
+  // Featured + Spotlight designs: a couple of white "highlight" pixels, picked from the brightest cells
+  // (own random sequence, so the rest of the design stays exactly the same)
+  const white = new Set<string>();
+  if (isBoxed) {
+    let s2 = 777 + Object.keys(boxed).indexOf(name) * 31;
+    const r2 = () => (s2 = (s2 * 16807) % 2147483647) / 2147483647;
+    const bright = [...cells].filter(([, o]) => o >= 0.75).map(([k]) => k);
+    while (white.size < Math.min(5, bright.length)) white.add(bright[Math.floor(r2() * bright.length)]);
+    // a few designs get extra white pixels in the planet / cluster nearest the middle of the thumbnail
+    const CENTER_EXTRA: Record<string, number> = { helix: 2 };
+    const extra = CENTER_EXTRA[name] ?? 0;
+    if (extra) {
+      const mid = (k: string) => { const [c, r] = k.split(',').map(Number); return Math.hypot(c - cx, r - cy); };
+      const near = bright.filter((k) => !white.has(k)).sort((a, b) => mid(a) - mid(b));
+      // spread them out a little (skip direct neighbours) so they read as separate sparkles
+      for (const k of near) {
+        if (white.size >= 5 + extra) break;
+        const [c, r] = k.split(',').map(Number);
+        const tooClose = [...white].some((w) => { const [wc, wr] = w.split(',').map(Number); return Math.abs(wc - c) <= 1 && Math.abs(wr - r) <= 1; });
+        if (!tooClose) white.add(k);
+      }
+    }
+  }
   // each pixel is pure blue or pure pink (never blended): blue leans left, pink leans right
   const colorNoise = makeNoise(rnd, 8);
   const LEVELS = 6, groups = new Map<string, string>();
@@ -196,8 +219,8 @@ export function pixelPattern(name: PatternName): PixelLayer[] {
   for (const [k, o] of cells) {
     const [c, r] = k.split(',').map(Number);
     const mixed = ((c - spanStart) / span * .75 + colorNoise(c, r) * .5 + (rnd() - .5) * .3) > .62 ? PINK : BLUE;
-    const fill = SOLO[name] ?? mixed;
-    const lvl = Math.min(LEVELS - 1, Math.floor(o * LEVELS));
+    const fill = white.has(k) ? '#FFFFFF' : SOLO[name] ?? mixed;
+    const lvl = white.has(k) ? LEVELS - 1 : Math.min(LEVELS - 1, Math.floor(o * LEVELS));
     const g = fill + '|' + lvl;
     groups.set(g, (groups.get(g) ?? '') + `M${OX + c * STEP} ${OY + r * STEP}h${CELL}v${CELL}h-${CELL}z`);
   }
